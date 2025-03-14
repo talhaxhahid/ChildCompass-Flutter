@@ -1,5 +1,7 @@
 
+import 'package:childcompass/screeens/child/child_registeration.dart';
 import 'package:childcompass/screeens/onBoardingScreen.dart';
+import 'package:childcompass/screeens/parent/parent_registeration.dart';
 import 'package:flutter/material.dart';
 
 
@@ -21,6 +23,8 @@ class MyApp extends StatelessWidget {
       initialRoute: initialRoute,
       routes: {
         '/onBoardingScreen': (context) => onBoardingScreen(),
+        '/childRegisteration': (context) => childRegistration(),
+        '/parentRegisteration': (context) => parentRegistration(),
 
       },
     );

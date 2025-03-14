@@ -52,6 +52,7 @@ class onBoardingScreen extends StatelessWidget {
                     const SizedBox(height: 10),
                     ElevatedButton(
                       onPressed: () {
+                        Navigator.pushNamed(context, '/childRegisteration');
                         // Navigate as child
                       },
                       style: ElevatedButton.styleFrom(
@@ -75,7 +76,7 @@ class onBoardingScreen extends StatelessWidget {
                     const SizedBox(height: 10),
                     ElevatedButton(
                       onPressed: () {
-                        // Navigate as parent
+                        Navigator.pushNamed(context, '/parentRegisteration');
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.orange,
