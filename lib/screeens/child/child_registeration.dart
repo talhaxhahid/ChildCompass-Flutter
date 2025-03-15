@@ -2,6 +2,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
+import '../../services/child_api_service.dart';
+
 class childRegistration extends StatefulWidget {
   @override
   _ChildRegistrationState createState() => _ChildRegistrationState();
@@ -173,5 +175,18 @@ class _ChildRegistrationState extends State<childRegistration> {
         ),
       ),
     );
+  }
+  void handleRegister(BuildContext context) async {
+    // final result = await childApiService.registerChild(email, password);
+    //
+    // if (result != null) {
+    //   // Navigate to home if login is successful
+    //   Navigator.pushNamed(context, '/childCode');
+    // } else {
+    //   // Show error message
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     SnackBar(content: Text("Server Connection Error")),
+    //   );
+    // }
   }
 }

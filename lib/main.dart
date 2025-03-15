@@ -1,7 +1,7 @@
 
 import 'package:childcompass/screeens/child/child_code.dart';
 import 'package:childcompass/screeens/child/child_registeration.dart';
-import 'package:childcompass/screeens/onBoardingScreen.dart';
+import 'package:childcompass/screeens/mutual/onBoardingScreen.dart';
 import 'package:childcompass/screeens/parent/child_connection.dart';
 import 'package:childcompass/screeens/parent/email_verification.dart';
 import 'package:childcompass/screeens/parent/parent_login.dart';
