@@ -8,9 +8,9 @@ class childCode extends StatefulWidget {
 }
 
 class _ChildCodeState extends State<childCode> {
-
   @override
   Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -96,7 +96,7 @@ class _ChildCodeState extends State<childCode> {
 
                           width: 150,
                           height: 60,
-                          child: Center(child: Text("3 9 Z Y", style: TextStyle(color: Colors.black , fontWeight: FontWeight.bold,fontFamily: "Quantico" , fontSize: 28),)),
+                          child: Center(child: Text(args?['connectionString'] ?? 'ERROR', style: TextStyle(letterSpacing: 8,color: Colors.black , fontWeight: FontWeight.bold,fontFamily: "Quantico" , fontSize: 28),)),
                         ),
                         SizedBox(height: 10),
                         Text("Use this code in your parent app to build connection with your parent . you can find this code later in your profile",textAlign: TextAlign.center, style: TextStyle(color: Colors.black , fontWeight: FontWeight.bold,fontFamily: "Quantico" , fontSize: 12),),

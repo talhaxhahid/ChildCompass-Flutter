@@ -10,6 +10,8 @@ class childRegistration extends StatefulWidget {
 }
 
 class _ChildRegistrationState extends State<childRegistration> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _ageController = TextEditingController();
   String selectedGender = "Boy";
 
   void toggleGender() {
@@ -97,6 +99,7 @@ class _ChildRegistrationState extends State<childRegistration> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         TextField(
+                          controller: _nameController,
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: Colors.white.withOpacity(0.8),
@@ -109,6 +112,7 @@ class _ChildRegistrationState extends State<childRegistration> {
                         ),
                         SizedBox(height: 10),
                         TextField(
+                          controller: _ageController,
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
                             filled: true,
@@ -150,7 +154,7 @@ class _ChildRegistrationState extends State<childRegistration> {
                         ),
                         SizedBox(height: 10),
                         ElevatedButton(
-                          onPressed: ()=>{Navigator.pushNamed(context, '/childCode')},
+                          onPressed: ()=>{handleRegister(context)},
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.orange,
                             shape: RoundedRectangleBorder(
@@ -177,16 +181,17 @@ class _ChildRegistrationState extends State<childRegistration> {
     );
   }
   void handleRegister(BuildContext context) async {
-    // final result = await childApiService.registerChild(email, password);
-    //
-    // if (result != null) {
-    //   // Navigate to home if login is successful
-    //   Navigator.pushNamed(context, '/childCode');
-    // } else {
-    //   // Show error message
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     SnackBar(content: Text("Server Connection Error")),
-    //   );
-    // }
+    final result = await childApiService.registerChild(_nameController.text, _ageController.text ,selectedGender);
+
+    if (result != null) {
+      // Navigate to home if login is successful
+      print(result['child']['connectionString']);
+      Navigator.pushNamed(context, '/childCode',arguments: {'connectionString': result['child']['connectionString']},);
+    } else {
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Server Connection Error")),
+      );
+    }
   }
 }

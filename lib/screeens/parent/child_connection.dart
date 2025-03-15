@@ -132,7 +132,7 @@ class _childConnectionState extends State<childConnection> {
                               child: TextField(
                                 controller: _controller1,
                                 focusNode: _focusNode1,
-                                keyboardType: TextInputType.number,
+                                keyboardType: TextInputType.text,
                                 inputFormatters: [
                                   LengthLimitingTextInputFormatter(1), // Limits input to 1 character
                                   FilteringTextInputFormatter.digitsOnly, // Ensures only numbers are allowed
@@ -159,7 +159,7 @@ class _childConnectionState extends State<childConnection> {
                               child: TextField(
                                 controller: _controller2,
                                 focusNode: _focusNode2,
-                                keyboardType: TextInputType.number,
+                                keyboardType: TextInputType.text,
                                 inputFormatters: [
                                   LengthLimitingTextInputFormatter(1),
                                   FilteringTextInputFormatter.digitsOnly,
@@ -185,7 +185,7 @@ class _childConnectionState extends State<childConnection> {
                               child: TextField(
                                 controller: _controller3,
                                 focusNode: _focusNode3,
-                                keyboardType: TextInputType.number,
+                                keyboardType: TextInputType.text,
                                 inputFormatters: [
                                   LengthLimitingTextInputFormatter(1),
                                   FilteringTextInputFormatter.digitsOnly,
@@ -211,7 +211,7 @@ class _childConnectionState extends State<childConnection> {
                               child: TextField(
                                 controller: _controller4,
                                 focusNode: _focusNode4,
-                                keyboardType: TextInputType.number,
+                                keyboardType: TextInputType.text,
                                 inputFormatters: [
                                   LengthLimitingTextInputFormatter(1),
                                   FilteringTextInputFormatter.digitsOnly,
