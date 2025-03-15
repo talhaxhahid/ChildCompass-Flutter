@@ -148,7 +148,7 @@ class _ChildRegistrationState extends State<childRegistration> {
                         ),
                         SizedBox(height: 10),
                         ElevatedButton(
-                          onPressed: () {},
+                          onPressed: ()=>{Navigator.pushNamed(context, '/childCode')},
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.orange,
                             shape: RoundedRectangleBorder(

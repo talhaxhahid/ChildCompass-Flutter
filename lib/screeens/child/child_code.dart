@@ -2,18 +2,16 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
-class parentRegistration extends StatefulWidget {
+class childCode extends StatefulWidget {
   @override
-  _ParentRegistrationState createState() => _ParentRegistrationState();
+  _ChildCodeState createState() => _ChildCodeState();
 }
 
-class _ParentRegistrationState extends State<parentRegistration> {
- 
+class _ChildCodeState extends State<childCode> {
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBody: true,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -31,9 +29,9 @@ class _ParentRegistrationState extends State<parentRegistration> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
+      body: SafeArea(
+        top: false,
         child: Container(
-         height:    MediaQuery.of(context).size.height,
           padding: EdgeInsets.symmetric(horizontal: 20),
           decoration: BoxDecoration(
             image: DecorationImage(
@@ -43,18 +41,17 @@ class _ParentRegistrationState extends State<parentRegistration> {
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            spacing: 5,
+            spacing: 10,
             children: [
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
-
                 children: [
                   Expanded(
                     flex: 2,
                     child: Transform.scale(
-                      scale: 1.1,
+                      scale: 1.2,
                       child: Lottie.asset(
-                        "assets/animations/parent.json",
+                        "assets/animations/child.json",
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -65,7 +62,7 @@ class _ParentRegistrationState extends State<parentRegistration> {
                       width: double.infinity,
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image: AssetImage("assets/images/messageBox/goodparent.png"),
+                          image: AssetImage("assets/images/messageBox/almostdone.png"),
                           fit: BoxFit.contain,
                           alignment: Alignment.center,
                         ),
@@ -89,49 +86,23 @@ class _ParentRegistrationState extends State<parentRegistration> {
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text("REGISTER", style: TextStyle(color: Colors.black , fontWeight: FontWeight.bold,fontFamily: "Quantico" , fontSize: 18),),
-                        SizedBox(height: 10,),
-                        TextField(
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.white.withOpacity(0.8),
-                            hintText: "Name",
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
+                        Text("CONNECT TO YOUR PARENT", style: TextStyle(color: Colors.black , fontWeight: FontWeight.bold,fontFamily: "Quantico" , fontSize: 18),),
+
+                        SizedBox(height: 10),
+                        Container(
+                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(15),color: Colors.white),
+
+                          width: 150,
+                          height: 60,
+                          child: Center(child: Text("3 9 Z Y", style: TextStyle(color: Colors.black , fontWeight: FontWeight.bold,fontFamily: "Quantico" , fontSize: 28),)),
                         ),
                         SizedBox(height: 10),
-                        TextField(
-                          keyboardType: TextInputType.emailAddress,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.white.withOpacity(0.8),
-                            hintText: "Email",
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                    TextField(
-                      keyboardType: TextInputType.visiblePassword,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white.withOpacity(0.8),
-                        hintText: "Password",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                    ),
+                        Text("Use this code in your parent app to build connection with your parent . you can find this code later in your profile",textAlign: TextAlign.center, style: TextStyle(color: Colors.black , fontWeight: FontWeight.bold,fontFamily: "Quantico" , fontSize: 12),),
                         SizedBox(height: 10),
                         ElevatedButton(
-                          onPressed: ()=>{Navigator.pushNamed(context, '/emailVerification')},
+                          onPressed: () {},
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.orange,
                             shape: RoundedRectangleBorder(
@@ -145,14 +116,6 @@ class _ParentRegistrationState extends State<parentRegistration> {
                               style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
                             ),
                           ),
-                        ),
-                        SizedBox(height: 10,),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text("Already have an account ? ", style: TextStyle(color: Colors.black , fontWeight: FontWeight.bold,fontFamily: "Quantico" , fontSize: 12),),
-                            InkWell(onTap: ()=>{Navigator.pushNamed(context, '/parentLogin')}, child: Text("Login", style: TextStyle(color: Colors.orange , fontWeight: FontWeight.bold,fontFamily: "Quantico" , fontSize: 12 ),)),
-                          ],
                         ),
                       ],
                     ),

@@ -1,6 +1,10 @@
 
+import 'package:childcompass/screeens/child/child_code.dart';
 import 'package:childcompass/screeens/child/child_registeration.dart';
 import 'package:childcompass/screeens/onBoardingScreen.dart';
+import 'package:childcompass/screeens/parent/child_connection.dart';
+import 'package:childcompass/screeens/parent/email_verification.dart';
+import 'package:childcompass/screeens/parent/parent_login.dart';
 import 'package:childcompass/screeens/parent/parent_registeration.dart';
 import 'package:flutter/material.dart';
 
@@ -25,6 +29,11 @@ class MyApp extends StatelessWidget {
         '/onBoardingScreen': (context) => onBoardingScreen(),
         '/childRegisteration': (context) => childRegistration(),
         '/parentRegisteration': (context) => parentRegistration(),
+        '/parentLogin': (context) => parentLogin(),
+        '/emailVerification': (context) => EmailVerification(),
+        '/childConnection': (context) => childConnection(),
+        '/childCode': (context) => childCode(),
+
 
       },
     );

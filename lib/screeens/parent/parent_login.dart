@@ -2,13 +2,13 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
-class parentRegistration extends StatefulWidget {
+class parentLogin extends StatefulWidget {
   @override
-  _ParentRegistrationState createState() => _ParentRegistrationState();
+  _ParentLoginState createState() => _ParentLoginState();
 }
 
-class _ParentRegistrationState extends State<parentRegistration> {
- 
+class _ParentLoginState extends State<parentLogin> {
+
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,7 @@ class _ParentRegistrationState extends State<parentRegistration> {
       ),
       body: SingleChildScrollView(
         child: Container(
-         height:    MediaQuery.of(context).size.height,
+          height:    MediaQuery.of(context).size.height,
           padding: EdgeInsets.symmetric(horizontal: 20),
           decoration: BoxDecoration(
             image: DecorationImage(
@@ -65,7 +65,7 @@ class _ParentRegistrationState extends State<parentRegistration> {
                       width: double.infinity,
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image: AssetImage("assets/images/messageBox/goodparent.png"),
+                          image: AssetImage("assets/images/messageBox/welcomeback.png"),
                           fit: BoxFit.contain,
                           alignment: Alignment.center,
                         ),
@@ -90,19 +90,8 @@ class _ParentRegistrationState extends State<parentRegistration> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text("REGISTER", style: TextStyle(color: Colors.black , fontWeight: FontWeight.bold,fontFamily: "Quantico" , fontSize: 18),),
-                        SizedBox(height: 10,),
-                        TextField(
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.white.withOpacity(0.8),
-                            hintText: "Name",
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
-                        ),
+                        Text("LOGIN", style: TextStyle(color: Colors.black , fontWeight: FontWeight.bold,fontFamily: "Quantico" , fontSize: 18),),
+
                         SizedBox(height: 10),
                         TextField(
                           keyboardType: TextInputType.emailAddress,
@@ -117,21 +106,21 @@ class _ParentRegistrationState extends State<parentRegistration> {
                           ),
                         ),
                         SizedBox(height: 10),
-                    TextField(
-                      keyboardType: TextInputType.visiblePassword,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white.withOpacity(0.8),
-                        hintText: "Password",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide.none,
+                        TextField(
+                          keyboardType: TextInputType.visiblePassword,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white.withOpacity(0.8),
+                            hintText: "Password",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
                         SizedBox(height: 10),
                         ElevatedButton(
-                          onPressed: ()=>{Navigator.pushNamed(context, '/emailVerification')},
+                          onPressed: () {},
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.orange,
                             shape: RoundedRectangleBorder(
@@ -150,8 +139,8 @@ class _ParentRegistrationState extends State<parentRegistration> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text("Already have an account ? ", style: TextStyle(color: Colors.black , fontWeight: FontWeight.bold,fontFamily: "Quantico" , fontSize: 12),),
-                            InkWell(onTap: ()=>{Navigator.pushNamed(context, '/parentLogin')}, child: Text("Login", style: TextStyle(color: Colors.orange , fontWeight: FontWeight.bold,fontFamily: "Quantico" , fontSize: 12 ),)),
+                            Text("Don't have an account ? ", style: TextStyle(color: Colors.black , fontWeight: FontWeight.bold,fontFamily: "Quantico" , fontSize: 12),),
+                            InkWell(onTap: ()=>{Navigator.pushNamed(context, '/parentRegisteration')}, child: Text("Register", style: TextStyle(color: Colors.orange , fontWeight: FontWeight.bold,fontFamily: "Quantico" , fontSize: 12 ),)),
                           ],
                         ),
                       ],
@@ -166,3 +155,4 @@ class _ParentRegistrationState extends State<parentRegistration> {
     );
   }
 }
+
