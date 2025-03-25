@@ -2,7 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../services/child_api_service.dart';
+import '../../services/child/child_api_service.dart';
 
 class childRegistration extends StatefulWidget {
   @override

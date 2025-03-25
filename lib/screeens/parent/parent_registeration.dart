@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart';
 
 import '../../provider/parent_email_provider.dart';
-import '../../services/parent_api_service.dart';
+import '../../services/parent/parent_api_service.dart';
 import 'email_verification.dart';
 
 class parentRegistration extends ConsumerStatefulWidget {

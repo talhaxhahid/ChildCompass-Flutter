@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
 
-import '../../services/parent_api_service.dart';
+import '../../services/parent/parent_api_service.dart';
 
 class parentLogin extends StatefulWidget {
   @override

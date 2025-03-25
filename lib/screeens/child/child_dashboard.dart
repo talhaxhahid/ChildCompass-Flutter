@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../core/permissions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../services/child_location_service.dart';
+import '../../services/child/child_background_service.dart';
+import '../../services/child/child_location_service.dart';
 
 class childDashboard extends StatefulWidget {
   @override
@@ -14,6 +15,7 @@ class _childDashboardState extends State<childDashboard> {
 
   @override
   void initState() {
+    ChildBackgroundService();
     _requestPermissions();
     getChildData();
     super.initState();

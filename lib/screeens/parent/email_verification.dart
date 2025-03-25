@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
-import '../../services/parent_api_service.dart';
+import '../../services/parent/parent_api_service.dart';
 import '../../provider/parent_email_provider.dart';
 
 class EmailVerification extends ConsumerStatefulWidget {
