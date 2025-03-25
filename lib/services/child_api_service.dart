@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:childcompass/core/api_constants.dart';
 
@@ -7,9 +8,6 @@ class childApiService {
 
   // Register API Call
   static Future<Map<String, dynamic>?> registerChild(String name, String age , String gender) async {
-    print(name);
-    print(age);
-    print(gender);
     try {
       final response = await http.post(
         Uri.parse(ApiConstants.childRegisteration),
@@ -30,6 +28,10 @@ class childApiService {
       return null;
     }
   }
+
+
+
+
 
 
 }

@@ -1,21 +1,27 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 
-class childConnection extends StatefulWidget {
+import '../../services/parent_api_service.dart';
+import '../../provider/parent_email_provider.dart';
+
+class childConnection extends ConsumerStatefulWidget {
   @override
-  _childConnectionState createState() => _childConnectionState();
+  ConsumerState<childConnection> createState() => _childConnectionState();
 }
 
-class _childConnectionState extends State<childConnection> {
+class _childConnectionState extends ConsumerState<childConnection> {
+
+
   // Focus nodes for each text field
   FocusNode _focusNode1 = FocusNode();
   FocusNode _focusNode2 = FocusNode();
   FocusNode _focusNode3 = FocusNode();
   FocusNode _focusNode4 = FocusNode();
 
-  // Controllers for each text field (optional)
+  // Controllers for each text field
   TextEditingController _controller1 = TextEditingController();
   TextEditingController _controller2 = TextEditingController();
   TextEditingController _controller3 = TextEditingController();
@@ -28,6 +34,10 @@ class _childConnectionState extends State<childConnection> {
     _focusNode2.dispose();
     _focusNode3.dispose();
     _focusNode4.dispose();
+    _controller1.dispose();
+    _controller2.dispose();
+    _controller3.dispose();
+    _controller4.dispose();
     super.dispose();
   }
 
@@ -60,7 +70,7 @@ class _childConnectionState extends State<childConnection> {
       ),
       body: SingleChildScrollView(
         child: Container(
-          height:    MediaQuery.of(context).size.height,
+          height: MediaQuery.of(context).size.height,
           padding: EdgeInsets.symmetric(horizontal: 20),
           decoration: BoxDecoration(
             image: DecorationImage(
@@ -70,11 +80,9 @@ class _childConnectionState extends State<childConnection> {
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            spacing: 5,
             children: [
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
-
                 children: [
                   Expanded(
                     flex: 2,
@@ -117,124 +125,53 @@ class _childConnectionState extends State<childConnection> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text("CHILD CONNECTION", style: TextStyle(color: Colors.black , fontWeight: FontWeight.bold,fontFamily: "Quantico" , fontSize: 18),),
-
+                        Text(
+                          "CHILD CONNECTION",
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: "Quantico",
+                              fontSize: 18),
+                        ),
                         SizedBox(height: 10),
-                        Text("Enter the Code in your Child’s App to build connection with your child , you can find the Code in the settings",textAlign: TextAlign.center, style: TextStyle(color: Colors.black , fontWeight: FontWeight.bold,fontFamily: "Quantico" , fontSize: 12),),
-
+                        Text(
+                          "Enter the Code in your Child’s App to build connection with your child. You can find the Code in the settings.",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: "Quantico",
+                              fontSize: 12),
+                        ),
                         SizedBox(height: 10),
                         Row(
+                          spacing: 10,
                           mainAxisAlignment: MainAxisAlignment.center,
-                          spacing: 5,
                           children: [
-                            SizedBox(
-                              width: 60,
-                              child: TextField(
-                                controller: _controller1,
-                                focusNode: _focusNode1,
-                                keyboardType: TextInputType.text,
-                                inputFormatters: [
-                                  LengthLimitingTextInputFormatter(1), // Limits input to 1 character
-                                  FilteringTextInputFormatter.digitsOnly, // Ensures only numbers are allowed
-                                ],
-                                textAlign: TextAlign.center,
-                                decoration: InputDecoration(
-                                  filled: true,
-                                  fillColor: Colors.white.withOpacity(0.8),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                ),
-                                onChanged: (value) {
-                                  if (value.length == 1) {
-                                    // Move focus to the next field
-                                    _moveFocus(_focusNode1, _focusNode2);
-                                  }
-                                },
-                              ),
-                            ),
-                            SizedBox(
-                              width: 60,
-                              child: TextField(
-                                controller: _controller2,
-                                focusNode: _focusNode2,
-                                keyboardType: TextInputType.text,
-                                inputFormatters: [
-                                  LengthLimitingTextInputFormatter(1),
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                textAlign: TextAlign.center,
-                                decoration: InputDecoration(
-                                  filled: true,
-                                  fillColor: Colors.white.withOpacity(0.8),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                ),
-                                onChanged: (value) {
-                                  if (value.length == 1) {
-                                    _moveFocus(_focusNode2, _focusNode3);
-                                  }
-                                },
-                              ),
-                            ),
-                            SizedBox(
-                              width: 60,
-                              child: TextField(
-                                controller: _controller3,
-                                focusNode: _focusNode3,
-                                keyboardType: TextInputType.text,
-                                inputFormatters: [
-                                  LengthLimitingTextInputFormatter(1),
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                textAlign: TextAlign.center,
-                                decoration: InputDecoration(
-                                  filled: true,
-                                  fillColor: Colors.white.withOpacity(0.8),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                ),
-                                onChanged: (value) {
-                                  if (value.length == 1) {
-                                    _moveFocus(_focusNode3, _focusNode4);
-                                  }
-                                },
-                              ),
-                            ),
-                            SizedBox(
-                              width: 60,
-                              child: TextField(
-                                controller: _controller4,
-                                focusNode: _focusNode4,
-                                keyboardType: TextInputType.text,
-                                inputFormatters: [
-                                  LengthLimitingTextInputFormatter(1),
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                textAlign: TextAlign.center,
-                                decoration: InputDecoration(
-                                  filled: true,
-                                  fillColor: Colors.white.withOpacity(0.8),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                ),
-                                onChanged: (value) {
-                                  // You can handle additional actions here if needed when the last field is filled
-                                },
-                              ),
-                            ),
+                            _buildInputField(_controller1, _focusNode1, _focusNode2),
+                            _buildInputField(_controller2, _focusNode2, _focusNode3),
+                            _buildInputField(_controller3, _focusNode3, _focusNode4),
+                            _buildInputField(_controller4, _focusNode4, null),
                           ],
                         ),
                         SizedBox(height: 10),
                         ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            final parentEmail = ref.watch(parentEmailProvider);
+                            String code = _controller1.text + _controller2.text + _controller3.text + _controller4.text;
+
+                            print("Parent Email: $parentEmail, Entered Code: $code");
+
+                            // ✅ Call the function to add the child connection
+                            if (parentEmail != null) {
+                              await handleAddChild(parentEmail!, code);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("Parent email is missing. Please log in again.")),
+                              );
+                            }
+
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.orange,
                             shape: RoundedRectangleBorder(
@@ -244,12 +181,11 @@ class _childConnectionState extends State<childConnection> {
                           ),
                           child: Center(
                             child: Text(
-                              "Sumbit",
+                              "Submit",
                               style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ),
-
                       ],
                     ),
                   ),
@@ -261,5 +197,59 @@ class _childConnectionState extends State<childConnection> {
       ),
     );
   }
+
+  // Reusable function to create input fields
+  Widget _buildInputField(TextEditingController controller, FocusNode focusNode, FocusNode? nextFocus) {
+    return SizedBox(
+      width: 60,
+      child: TextField(
+        controller: controller,
+        focusNode: focusNode,
+        keyboardType: TextInputType.text, // Accepts both numbers and letters
+        inputFormatters: [
+          LengthLimitingTextInputFormatter(1), // Limit input to 1 character
+          FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9]')), // Allow letters & numbers
+        ],
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: Colors.white.withOpacity(0.8),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
+        ),
+        onChanged: (value) {
+          if (value.length == 1 && nextFocus != null) {
+            _moveFocus(focusNode, nextFocus);
+          }
+        },
+      ),
+    );
+  }
+
+  Future<void> handleAddChild(String parentEmail, String connectionString) async {
+    final apiService = parentApiService(); // ✅ Ensure correct class name
+    final result = await apiService.addChild(parentEmail, connectionString);
+
+    if (result != null && result.containsKey("message")) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result["message"])),
+      );
+
+      print("API Response: ${result["message"]}");
+
+      if (result["message"].contains("Child connection string added successfully")) {
+        print("Child added successfully!");
+        if (mounted) {
+          Navigator.pop(context); // ✅ Close the add child screen
+        }
+      }
+    }
+  }
+
+
+
 }
 

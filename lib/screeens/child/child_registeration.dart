@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/child_api_service.dart';
 
 class childRegistration extends StatefulWidget {
@@ -181,12 +181,23 @@ class _ChildRegistrationState extends State<childRegistration> {
     );
   }
   void handleRegister(BuildContext context) async {
-    final result = await childApiService.registerChild(_nameController.text, _ageController.text ,selectedGender);
+    final result = await childApiService.registerChild(
+        _nameController.text, _ageController.text, selectedGender);
 
     if (result != null) {
+      // Store data in local storage
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('user', 'child');
+      await prefs.setString('connectionString', result['child']['connectionString']);
+      await prefs.setString('childName', result['child']['name']); // Example, add any data you need
+
       // Navigate to home if login is successful
-      print(result['child']['connectionString']);
-      Navigator.pushNamed(context, '/childCode',arguments: {'connectionString': result['child']['connectionString']},);
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/childCode',
+        arguments: {'connectionString': result['child']['connectionString']},
+          (Route<dynamic> route) => false,
+      );
     } else {
       // Show error message
       ScaffoldMessenger.of(context).showSnackBar(

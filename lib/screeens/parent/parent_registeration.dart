@@ -1,14 +1,26 @@
+import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart';
 
-class parentRegistration extends StatefulWidget {
+import '../../provider/parent_email_provider.dart';
+import '../../services/parent_api_service.dart';
+import 'email_verification.dart';
+
+class parentRegistration extends ConsumerStatefulWidget {
   @override
-  _ParentRegistrationState createState() => _ParentRegistrationState();
+  _parentRegistrationState createState() => _parentRegistrationState();
 }
 
-class _ParentRegistrationState extends State<parentRegistration> {
- 
+class _parentRegistrationState extends ConsumerState<parentRegistration> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool _isLoading = false;
+  String? _errorMessage;
+
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +45,10 @@ class _ParentRegistrationState extends State<parentRegistration> {
       ),
       body: SingleChildScrollView(
         child: Container(
-         height:    MediaQuery.of(context).size.height,
+          height: MediaQuery
+              .of(context)
+              .size
+              .height,
           padding: EdgeInsets.symmetric(horizontal: 20),
           decoration: BoxDecoration(
             image: DecorationImage(
@@ -43,11 +58,9 @@ class _ParentRegistrationState extends State<parentRegistration> {
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            spacing: 5,
             children: [
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
-
                 children: [
                   Expanded(
                     flex: 2,
@@ -65,7 +78,8 @@ class _ParentRegistrationState extends State<parentRegistration> {
                       width: double.infinity,
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image: AssetImage("assets/images/messageBox/goodparent.png"),
+                          image: AssetImage(
+                              "assets/images/messageBox/goodparent.png"),
                           fit: BoxFit.contain,
                           alignment: Alignment.center,
                         ),
@@ -90,9 +104,18 @@ class _ParentRegistrationState extends State<parentRegistration> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text("REGISTER", style: TextStyle(color: Colors.black , fontWeight: FontWeight.bold,fontFamily: "Quantico" , fontSize: 18),),
-                        SizedBox(height: 10,),
+                        Text(
+                          "REGISTER",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: "Quantico",
+                            fontSize: 18,
+                          ),
+                        ),
+                        SizedBox(height: 10),
                         TextField(
+                          controller: _nameController,
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: Colors.white.withOpacity(0.8),
@@ -105,6 +128,7 @@ class _ParentRegistrationState extends State<parentRegistration> {
                         ),
                         SizedBox(height: 10),
                         TextField(
+                          controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
                             filled: true,
@@ -117,41 +141,72 @@ class _ParentRegistrationState extends State<parentRegistration> {
                           ),
                         ),
                         SizedBox(height: 10),
-                    TextField(
-                      keyboardType: TextInputType.visiblePassword,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white.withOpacity(0.8),
-                        hintText: "Password",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide.none,
+                        TextField(
+                          controller: _passwordController,
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white.withOpacity(0.8),
+                            hintText: "Password",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
+                        SizedBox(height: 10),
+                        if (_errorMessage != null)
+                          Text(
+                            _errorMessage!,
+                            style: TextStyle(color: Colors.red, fontSize: 12),
+                          ),
                         SizedBox(height: 10),
                         ElevatedButton(
-                          onPressed: ()=>{Navigator.pushNamed(context, '/emailVerification')},
+                          onPressed: _isLoading ? null : () => handleRegister(context),
+
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.orange,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            padding: EdgeInsets.symmetric(vertical: 15),
+                            padding: EdgeInsets.symmetric(vertical: 15,horizontal: 20),
                           ),
-                          child: Center(
-                            child: Text(
-                              "Continue",
-                              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                          child: _isLoading
+                              ? CircularProgressIndicator(color: Colors.white)
+                              : Text(
+                            "Continue",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                        SizedBox(height: 10,),
+                        SizedBox(height: 10),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text("Already have an account ? ", style: TextStyle(color: Colors.black , fontWeight: FontWeight.bold,fontFamily: "Quantico" , fontSize: 12),),
-                            InkWell(onTap: ()=>{Navigator.pushNamed(context, '/parentLogin')}, child: Text("Login", style: TextStyle(color: Colors.orange , fontWeight: FontWeight.bold,fontFamily: "Quantico" , fontSize: 12 ),)),
+                            Text(
+                              "Already have an account? ",
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: "Quantico",
+                                fontSize: 12,
+                              ),
+                            ),
+                            InkWell(
+                              onTap: () =>
+                                  Navigator.pushNamed(context, '/parentLogin'),
+                              child: Text(
+                                "Login",
+                                style: TextStyle(
+                                  color: Colors.orange,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: "Quantico",
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ],
@@ -165,4 +220,61 @@ class _ParentRegistrationState extends State<parentRegistration> {
       ),
     );
   }
+
+
+  void handleRegister(BuildContext context) async {
+    String email = _emailController.text.trim();
+
+    if (_nameController.text.isEmpty ||
+        _emailController.text.isEmpty ||
+        _passwordController.text.isEmpty) {
+      setState(() {
+        _errorMessage = "All fields are required!";
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    final apiService = parentApiService();
+    final result = await apiService.registerParent(
+      _nameController.text.trim(),
+      email, // Use user-entered email
+      _passwordController.text.trim(),
+    );
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (result != null && result.containsKey("message")) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result["message"])),
+      );
+
+      print("Raw API Response: '${result["message"]}'");
+
+      if (result["message"].contains("Registration successful! Please check your email for a")) {
+        ref.read(parentEmailProvider.notifier).state = email; // Store the correct email
+        print("Email stored in provider: $email");
+        print("Navigating to Email Verification...");
+
+        Future.delayed(Duration(milliseconds: 300), () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => EmailVerification()),
+          );
+        });
+      }
+    } else {
+      setState(() {
+        _errorMessage = "Error: Something went wrong. Please try again.";
+      });
+    }
+  }
+
+
 }

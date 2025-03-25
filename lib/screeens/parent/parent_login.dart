@@ -2,13 +2,17 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
+
+import '../../services/parent_api_service.dart';
+
 class parentLogin extends StatefulWidget {
   @override
   _ParentLoginState createState() => _ParentLoginState();
 }
 
 class _ParentLoginState extends State<parentLogin> {
-
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -94,6 +98,7 @@ class _ParentLoginState extends State<parentLogin> {
 
                         SizedBox(height: 10),
                         TextField(
+                          controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
                             filled: true,
@@ -107,6 +112,7 @@ class _ParentLoginState extends State<parentLogin> {
                         ),
                         SizedBox(height: 10),
                         TextField(
+                          controller: _passwordController,
                           keyboardType: TextInputType.visiblePassword,
                           decoration: InputDecoration(
                             filled: true,
@@ -120,7 +126,14 @@ class _ParentLoginState extends State<parentLogin> {
                         ),
                         SizedBox(height: 10),
                         ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            handleLoginResponse(
+                                context,
+                                _emailController.text,  // Pass email
+                                _passwordController.text // Pass password
+                            );
+                          },
+
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.orange,
                             shape: RoundedRectangleBorder(
@@ -153,6 +166,23 @@ class _ParentLoginState extends State<parentLogin> {
         ),
       ),
     );
+  }
+  void handleLoginResponse(BuildContext context, String email, String password) async {
+    final parentApiService _apiService = parentApiService();
+    final response = await _apiService.loginParent(email, password);
+
+    if (response.containsKey("token")) {
+      // Login successful, store token and navigate
+      final String token = response["token"];
+      print("Login successful! Token: $token");
+      // Navigate to dashboard or home screen
+      Navigator.pushReplacementNamed(context, "/home");
+    } else {
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response["message"] ?? "Login failed")),
+      );
+    }
   }
 }
 

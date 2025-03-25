@@ -102,7 +102,13 @@ class _ChildCodeState extends State<childCode> {
                         Text("Use this code in your parent app to build connection with your parent . you can find this code later in your profile",textAlign: TextAlign.center, style: TextStyle(color: Colors.black , fontWeight: FontWeight.bold,fontFamily: "Quantico" , fontSize: 12),),
                         SizedBox(height: 10),
                         ElevatedButton(
-                          onPressed: () {},
+                          onPressed: ()=>{
+                          Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          '/childDashboard',
+                          (Route<dynamic> route) => false, // This removes all previous routes
+                          )
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.orange,
                             shape: RoundedRectangleBorder(
