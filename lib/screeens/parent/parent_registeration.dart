@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../provider/parent_email_provider.dart';
+import '../../provider/parent_provider.dart';
 import '../../services/parent/parent_api_service.dart';
 import 'email_verification.dart';
 
@@ -254,6 +255,9 @@ class _parentRegistrationState extends ConsumerState<parentRegistration> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(result["message"])),
       );
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('user', 'parent');
+      await prefs.setString('authToken', result['token']);
 
       print("Raw API Response: '${result["message"]}'");
 

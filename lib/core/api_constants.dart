@@ -22,5 +22,6 @@ class ApiConstants {
   static const String emailVerification = "$baseUrl/parent/verify-email";
   static const String parentLogin = "$baseUrl/parent/login";
   static const String connectChild = "$baseUrl/parent/add-child";
+  static const String parentDetails= "$baseUrl/parent/parent-details";
 
 }

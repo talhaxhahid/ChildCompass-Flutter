@@ -1,16 +1,19 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
+import '../../provider/parent_provider.dart';
 import '../../services/parent/parent_api_service.dart';
 
-class parentLogin extends StatefulWidget {
+class parentLogin extends ConsumerStatefulWidget  {
   @override
   _ParentLoginState createState() => _ParentLoginState();
 }
 
-class _ParentLoginState extends State<parentLogin> {
+class _ParentLoginState extends ConsumerState<parentLogin> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -176,7 +179,14 @@ class _ParentLoginState extends State<parentLogin> {
       final String token = response["token"];
       print("Login successful! Token: $token");
       // Navigate to dashboard or home screen
-      Navigator.pushReplacementNamed(context, "/home");
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('user', 'parent');
+      await prefs.setString('authToken', token);
+      ref.read(parentEmailProvider.notifier).state = response['parent']['email'];
+      if(response['message']=='verifyEmail')
+        Navigator.pushReplacementNamed(context, "/emailVerification");
+      else
+      Navigator.pushReplacementNamed(context, "/parentDashboard");
     } else {
       // Show error message
       ScaffoldMessenger.of(context).showSnackBar(

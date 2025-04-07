@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/parent/parent_api_service.dart';
-import '../../provider/parent_email_provider.dart';
+import '../../provider/parent_provider.dart';
 
 class childConnection extends ConsumerStatefulWidget {
   @override
@@ -157,7 +158,7 @@ class _childConnectionState extends ConsumerState<childConnection> {
                         SizedBox(height: 10),
                         ElevatedButton(
                           onPressed: () async {
-                            final parentEmail = ref.watch(parentEmailProvider);
+                            var parentEmail = ref.watch(parentEmailProvider);
                             String code = _controller1.text + _controller2.text + _controller3.text + _controller4.text;
 
                             print("Parent Email: $parentEmail, Entered Code: $code");
@@ -167,8 +168,15 @@ class _childConnectionState extends ConsumerState<childConnection> {
                               await handleAddChild(parentEmail!, code);
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("Parent email is missing. Please log in again.")),
+                                SnackBar(content: Text("Connecting to Server, Kindly Wait")),
                               );
+                              SharedPreferences prefs = await SharedPreferences.getInstance();
+                              var token = prefs.get('authToken');
+                              final response = await parentApiService.parentDetails(token.toString());
+                              print(response['body']);
+                              parentEmail=response['body']['parent']['email'];
+                              await handleAddChild(parentEmail!, code);
+
                             }
 
                           },
@@ -240,11 +248,13 @@ class _childConnectionState extends ConsumerState<childConnection> {
 
       print("API Response: ${result["message"]}");
 
-      if (result["message"].contains("Child connection string added successfully")) {
+      if (result["success"]==true) {
         print("Child added successfully!");
-        if (mounted) {
-          Navigator.pop(context); // ✅ Close the add child screen
-        }
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/parentDashboard',
+              (Route<dynamic> route) => false,
+        );
       }
     }
   }

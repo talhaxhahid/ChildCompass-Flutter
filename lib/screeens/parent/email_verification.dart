@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/parent/parent_api_service.dart';
-import '../../provider/parent_email_provider.dart';
+import '../../provider/parent_provider.dart';
 
 class EmailVerification extends ConsumerStatefulWidget {
 
@@ -51,9 +52,21 @@ class _EmailVerificationState extends ConsumerState<EmailVerification> {
 
   Future<void> handleVerifyEmail(BuildContext context) async {
     String? email = ref.read(parentEmailProvider);
+
     if (email == null || email.isEmpty) {
-      setState(() => _errorMessage = "Email is required!");
-      return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Connecting to Server, Kindly Wait")),
+      );
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var token = prefs.get('authToken');
+      print(token);
+      final response = await parentApiService.parentDetails(token.toString());
+      print("My Response : "+response.toString());
+      email=response['body']['parent']['email'];
+      if (email == null || email.isEmpty) {
+        setState(() => _errorMessage = "Email is required!");
+        return;
+      }
     }
 
     String verificationCode =
@@ -67,8 +80,15 @@ class _EmailVerificationState extends ConsumerState<EmailVerification> {
     setState(() => _isLoading = true);
     try {
       final response = await parentApiService().verifyEmail(email, verificationCode);
-      if (response != null && response.containsKey("message")) {
+      if (response == 200) {
+       if( Navigator.of(context).canPop())
         Navigator.pushNamed(context, '/childConnection');
+       else
+         Navigator.pushNamedAndRemoveUntil(
+           context,
+           '/parentDashboard',
+               (Route<dynamic> route) => false,
+         );
       } else {
         setState(() => _errorMessage = response?["error"] ?? "Invalid code");
       }

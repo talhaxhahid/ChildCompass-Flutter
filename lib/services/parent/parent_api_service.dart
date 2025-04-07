@@ -34,7 +34,7 @@ class parentApiService {
   }
 
   //VERIFY-EMAIL
-  Future<Map<String, dynamic>?> verifyEmail(String email, String code) async {
+  Future<dynamic> verifyEmail(String email, String code) async {
     try {
       final response = await http.post(
         Uri.parse(ApiConstants.emailVerification),
@@ -49,9 +49,9 @@ class parentApiService {
       print("Response Body: ${response.body}");
 
       if (response.statusCode == 200) {
-        return jsonDecode(response.body);
+        return 200;
       } else {
-        return jsonDecode(response.body);
+        return 400;
       }
     } catch (e) {
       print("Network Error: $e");
@@ -70,6 +70,20 @@ class parentApiService {
       );
 
       return jsonDecode(response.body);
+    } catch (e) {
+      return {"message": "An error occurred: $e"};
+    }
+  }
+
+ static Future<Map<String, dynamic>> parentDetails(String token) async {
+    final url = Uri.parse(ApiConstants.parentDetails); // API endpoint
+    try {
+      final response = await http.get(
+        url,
+        headers: {"Content-Type": "application/json",'Authorization': 'Bearer $token'},
+      );
+
+      return {"body":jsonDecode(response.body),"status":response.statusCode};
     } catch (e) {
       return {"message": "An error occurred: $e"};
     }
@@ -98,6 +112,7 @@ class parentApiService {
       return {"success": false, "message": "Error: $e"};
     }
   }
+
 
 
 }
