@@ -15,7 +15,7 @@ class _childDashboardState extends State<childDashboard> {
 
   @override
   void initState() {
-    ChildBackgroundService();
+
     _requestPermissions();
     getChildData();
     super.initState();
@@ -31,6 +31,7 @@ class _childDashboardState extends State<childDashboard> {
 
   Future<void> _requestPermissions() async {
     await permissions.requestLocationPermissions();
+    ChildBackgroundService();
 
   }
 

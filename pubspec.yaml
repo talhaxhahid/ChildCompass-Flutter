@@ -19,6 +19,8 @@ dependencies:
   geolocator: ^13.0.2
   web_socket_client: ^0.2.0
   flutter_background_service: ^5.1.0
+  flutter_map: ^8.1.1
+  latlong2: ^0.9.1
 
 
 dev_dependencies:

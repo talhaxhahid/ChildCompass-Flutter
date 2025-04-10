@@ -25,9 +25,11 @@ Future<void> ChildBackgroundService() async {
 void onStart(ServiceInstance service) {
 
   startSharingLocation();
+
   service.on("stopService").listen((event) {
     service.stopSelf();
   });
+
 
   service.on("task").listen((event) {
     print("Background task running...");

@@ -5,5 +5,5 @@ final parentEmailProvider = StateProvider<String?>((ref) => null);
 
 final parentNameProvider = StateProvider<String?>((ref)=>null);
 
-final connectedChildsProvider = StateProvider<List<String?>>((ref) => []);
+final connectedChildsProvider = StateProvider<List<dynamic?>>((ref) => []);
 
