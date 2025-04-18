@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:childcompass/screeens/parent/dashboard_buttons.dart';
 import 'package:childcompass/screeens/parent/liveMap.dart';
 import 'package:flutter/material.dart';
@@ -5,7 +7,9 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:childcompass/provider/parent_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
+import '../../core/api_constants.dart';
 import '../../services/parent/parent_api_service.dart';
 
 class parentDashboard extends ConsumerStatefulWidget {
@@ -18,6 +22,7 @@ class _parentDashboardState extends ConsumerState<parentDashboard> {
   String? parentEmail;
   List<String>? connectedChilds;
   bool isLoading = true;
+  WebSocketChannel? channel = IOWebSocketChannel.connect(ApiConstants.ActiveStatusSharingSocket);
 
   @override
   void initState() {
@@ -25,6 +30,32 @@ class _parentDashboardState extends ConsumerState<parentDashboard> {
     initDashboard();
   }
 
+  void connectToWebSocket() {
+
+    channel!.sink.add(jsonEncode({
+      'type': 'register_parent',
+      'targetchildId': ref.watch(connectedChildsProvider),
+      'parentId': ref.read(parentEmailProvider),
+    }));
+
+    channel!.stream.listen(
+          (data) {
+        final decoded = jsonDecode(data);
+        ref.read(connectedChildsStatusProvider.notifier).state=decoded['children'];
+        print("Active Status: "+decoded['children'].toString());
+
+      },
+      onError: (error) {
+        print("WebSocket error: $error");
+
+      },
+      onDone: () {
+        print("WebSocket connection closed.");
+
+      },
+      cancelOnError: true,
+    );
+  }
   void initDashboard() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.get('authToken');
@@ -40,6 +71,8 @@ class _parentDashboardState extends ConsumerState<parentDashboard> {
     setState(() {
       isLoading = false;
     });
+
+    connectToWebSocket();
   }
 
   @override
@@ -72,30 +105,33 @@ class _parentDashboardState extends ConsumerState<parentDashboard> {
             ],
           ),
         ),
-        body: Container(
-          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-          child: Column(
-            children: [
-              connectedChildsWidget(),
-              SizedBox(
-                height: 30,
-              ),
-              !isLoading
-                  ? LiveMap(
-                      childId: connectedChilds![0] ?? "",
-                      parentEmail: parentEmail ?? "",
-                    )
-                  : Text("Map"),
-              SizedBox(
-                height: 30,
-              ),
-              ParentDashboardButton(),
-            ],
+        body: SingleChildScrollView(
+          child: Container(
+            padding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+            child: Column(
+              children: [
+                connectedChildsWidget(),
+                SizedBox(
+                  height: 30,
+                ),
+                !isLoading
+                    ? LiveMap()
+                    : Text("Map"),
+                SizedBox(
+                  height: 30,
+                ),
+                ParentDashboardButton(),
+              ],
+            ),
           ),
         ));
   }
 
   Widget connectedChildsWidget() {
+
+
+
+
     void _switchChild(String child) {
       ref.read(currentChildProvider.notifier).state = child;
     }
@@ -114,30 +150,54 @@ class _parentDashboardState extends ConsumerState<parentDashboard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children:
                       List.generate(connectedChilds?.length ?? 0, (index) {
-                    return GestureDetector(
-                      onTap: () => {_switchChild(connectedChilds![index])},
-                      child: Container(
-                        margin: EdgeInsets.only(right: 10),
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: ref.watch(currentChildProvider).toString()==connectedChilds![index]? Colors.blueGrey :Color(0xFF4D566A), // Background color for the pill
-                          borderRadius: BorderRadius.circular(30), // Pill shape
-                          boxShadow: [
-                            BoxShadow(color: Colors.black26, blurRadius: 4)
-                          ], // Optional shadow for depth
-                        ),
-                        child: Text(
-                          connectedChilds?[index] ?? "No Connected Childs",
-                          style: TextStyle(
-                            fontSize: 15,
-                            color: Colors.white, // Text color
-                            fontFamily: "Quantico",
+                        final statusMap = ref.watch(connectedChildsStatusProvider);
+                        final status = connectedChilds?[index];
+                        return GestureDetector(
+                          onTap: () => {_switchChild(connectedChilds![index])},
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              Container(
+                                margin: EdgeInsets.only(right: 10),
+                                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: ref.watch(currentChildProvider).toString() == connectedChilds![index]
+                                      ? Colors.blueGrey
+                                      : Color(0xFF4D566A),
+                                  borderRadius: BorderRadius.circular(30),
+                                  boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 4)],
+                                ),
+                                child: Text(
+                                  connectedChilds?[index] ?? "No Connected Childs",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: Colors.white,
+                                    fontFamily: "Quantico",
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                top: 2,
+                                right: 8,
+                                child: Container(
+                                  width: 10,
+                                  height: 10,
+                                  decoration: BoxDecoration(
+                                    //color: Colors.green,
+                                    color: statusMap != null && statusMap[status] == true
+                                        ? Colors.green
+                                        : statusMap != null && statusMap[status] == false
+                                        ? Colors.red
+                                        : Colors.grey,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: Colors.white, width: 1), // optional border
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ),
-                    );
-                  })),
+                        );
+                      })),
             ),
           ),
           GestureDetector(

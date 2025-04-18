@@ -1,6 +1,7 @@
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 
+import 'childActiveStatusService.dart';
 import 'child_location_service.dart';
 
 
@@ -25,12 +26,12 @@ Future<void> ChildBackgroundService() async {
 void onStart(ServiceInstance service) {
 
   startSharingLocation();
+  ChildActiveStatusService().start();
+
 
   service.on("stopService").listen((event) {
     service.stopSelf();
   });
-
-
   service.on("task").listen((event) {
     print("Background task running...");
   });

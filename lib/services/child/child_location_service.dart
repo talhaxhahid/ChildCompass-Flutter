@@ -15,50 +15,58 @@ Stream<Position> getLiveLocation() {
 }
 
 IOWebSocketChannel? channel;
-bool isConnected = false;
+bool isReconnecting = false;
 
-void connectWebSocket() {
-  channel = IOWebSocketChannel.connect(ApiConstants.locationSharingSocket);
+void connectWebSocket() async {
+  try {
+    channel = IOWebSocketChannel.connect(ApiConstants.locationSharingSocket);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var childId = prefs.getString('connectionString');
 
-  channel!.stream.listen(
-        (message) {
-      print("Received: $message");
-    },
-    onError: (error) {
-      print("WebSocket error: $error");
-      reconnect();
-    },
-    onDone: () {
-      print("WebSocket connection closed.");
-      reconnect();
-    },
-    cancelOnError: true,
-  );
+    channel!.sink.add(jsonEncode({
+      'type': 'register_child',
+      'childId': childId,
+    }));
+
+    channel!.stream.listen(
+          (message) {
+        print("Received: $message");
+      },
+      onError: (error) {
+        print("WebSocket error: $error");
+        reconnect();
+      },
+      onDone: () {
+        print("WebSocket connection closed.");
+        reconnect();
+      },
+      cancelOnError: true,
+    );
+  } catch (e) {
+    print("WebSocket connection failed: $e");
+    reconnect();
+  } finally {
+    isReconnecting = false; // Reset the flag after attempting to connect
+  }
 }
 
 void reconnect() {
-  if (!isConnected) {
-    isConnected = true; // Prevent multiple reconnection attempts
+  if (!isReconnecting) {
+    isReconnecting = true;
     Future.delayed(Duration(seconds: 5), () {
       print("Attempting to reconnect...");
       connectWebSocket();
-      isConnected = false;
     });
   }
 }
 
+
 void startSharingLocation() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var childId = prefs.getString('connectionString');
+  connectWebSocket();
 
-  if (channel == null) {
-    connectWebSocket();
-  }
 
-  channel!.sink.add(jsonEncode({
-    'type': 'register_child',
-    'childId': childId,
-  }));
 
   getLiveLocation().listen((Position position) {
     if (channel != null) {

@@ -10,6 +10,7 @@ class ApiConstants {
 
    //static const String locationSharingSocket ='ws://childcompass-backend.onrender.com/location';
    static const String locationSharingSocket ='ws://192.168.100.14:5000/location';
+  static const String ActiveStatusSharingSocket ='ws://192.168.100.14:5000/activeStatus';
 
 
   // *********************Child EndPoints***********************************
