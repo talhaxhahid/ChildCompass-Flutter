@@ -6,16 +6,19 @@ import 'package:childcompass/screeens/child/child_registeration.dart';
 import 'package:childcompass/screeens/mutual/onBoardingScreen.dart';
 import 'package:childcompass/screeens/parent/child_connection.dart';
 import 'package:childcompass/screeens/parent/email_verification.dart';
+import 'package:childcompass/screeens/parent/parentEndChildSettings.dart';
 import 'package:childcompass/screeens/parent/parent_dashboard.dart';
 import 'package:childcompass/screeens/parent/parent_login.dart';
 import 'package:childcompass/screeens/parent/parent_registeration.dart';
 import 'package:childcompass/services/parent/parent_api_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:flutter/material.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  MapboxOptions.setAccessToken("pk.eyJ1IjoiZW1hd2F0c29uIiwiYSI6ImNtOGoyNzB5YjBhdDcyaXMzeTBjY2FiZ2sifQ.lhvhhMAAJktVCSXiDyF8Mg");
   String intial_route='/onBoardingScreen';
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var user = prefs.get('user');
@@ -92,6 +95,7 @@ class MyApp extends StatelessWidget  {
         '/childCode': (context) => childCode(),
         '/childDashboard': (context) => childDashboard(),
         '/parentDashboard': (context) => parentDashboard(),
+        '/parentEndChildSettings':(context)=>ParentEndChildSettings(),
       },
     );
   }

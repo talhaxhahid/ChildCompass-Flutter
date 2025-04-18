@@ -113,6 +113,31 @@ class parentApiService {
     }
   }
 
+  // REMOVE-CHILD API
+  Future<Map<String, dynamic>> removeChild(String email, String connectionString) async {
+    final url = Uri.parse(ApiConstants.removeChild); // Make sure this endpoint is set correctly in your ApiConstants
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"email": email, "connectionString": connectionString}),
+      );
+
+      print("Response Status: ${response.statusCode}");
+      print("Response Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        return {"success": true, "message": "Child removed successfully"};
+      } else {
+        return {"success": false, "message": "Failed to remove child"};
+      }
+    } catch (e) {
+      return {"success": false, "message": "Error: $e"};
+    }
+  }
+
+
 
 
 }

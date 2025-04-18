@@ -21,6 +21,7 @@ dependencies:
   flutter_background_service: ^5.1.0
   flutter_map: ^8.1.1
   latlong2: ^0.9.1
+  mapbox_maps_flutter: ^2.7.0
 
 
 dev_dependencies:

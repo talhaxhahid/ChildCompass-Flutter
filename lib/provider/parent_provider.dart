@@ -5,5 +5,14 @@ final parentEmailProvider = StateProvider<String?>((ref) => null);
 
 final parentNameProvider = StateProvider<String?>((ref)=>null);
 
-final connectedChildsProvider = StateProvider<List<dynamic?>>((ref) => []);
+final connectedChildsProvider = StateProvider<List<dynamic>?>((ref) => []);
+
+final currentChildProvider= StateProvider<String?>((ref) => null);
+
+final speedProvider = StateProvider<String?>((ref) => "0");
+
+final maxSpeedProvider = StateProvider<String?>((ref) => "0");
+
+
+
 
