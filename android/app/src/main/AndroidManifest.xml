@@ -17,6 +17,8 @@
         android:label="childcompass"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
+        <meta-data android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBNM_nCEEzp-LP8PjRWnattz2wRggGTckU"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"

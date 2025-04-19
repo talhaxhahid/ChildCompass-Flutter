@@ -22,6 +22,11 @@ dependencies:
   flutter_map: ^8.1.1
   latlong2: ^0.9.1
   mapbox_maps_flutter: ^2.7.0
+  google_maps_flutter: ^2.12.1
+  widget_to_marker: ^1.0.6
+  image_picker: ^1.1.2
+  path_provider: ^2.1.5
+  path: ^1.9.1
 
 
 dev_dependencies:

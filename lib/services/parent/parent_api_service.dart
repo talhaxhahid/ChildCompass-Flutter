@@ -137,6 +137,26 @@ class parentApiService {
     }
   }
 
+  Future<List<dynamic>> getParentsByConnection(String connectionString) async {
+
+    final url = Uri.parse(ApiConstants.parentsList+connectionString);
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data['parents']; // This is a List of parents
+      } else {
+        print('Error: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Exception: $e');
+      return [];
+    }
+  }
+
 
 
 

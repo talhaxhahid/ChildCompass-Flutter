@@ -1,5 +1,5 @@
+import 'dart:async';
 import 'dart:convert';
-
 import 'package:childcompass/screeens/parent/dashboard_buttons.dart';
 import 'package:childcompass/screeens/parent/liveMap.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import '../../core/api_constants.dart';
+import '../../services/child/child_api_service.dart';
 import '../../services/parent/parent_api_service.dart';
 
 class parentDashboard extends ConsumerStatefulWidget {
@@ -30,32 +31,38 @@ class _parentDashboardState extends ConsumerState<parentDashboard> {
     initDashboard();
   }
 
-  void connectToWebSocket() {
+  StreamSubscription? _webSocketSubscription;
 
+  void connectToWebSocket() {
+    // Send registration message
     channel!.sink.add(jsonEncode({
       'type': 'register_parent',
       'targetchildId': ref.watch(connectedChildsProvider),
       'parentId': ref.read(parentEmailProvider),
     }));
 
-    channel!.stream.listen(
-          (data) {
-        final decoded = jsonDecode(data);
-        ref.read(connectedChildsStatusProvider.notifier).state=decoded['children'];
-        print("Active Status: "+decoded['children'].toString());
-
-      },
-      onError: (error) {
-        print("WebSocket error: $error");
-
-      },
-      onDone: () {
-        print("WebSocket connection closed.");
-
-      },
-      cancelOnError: true,
-    );
+    // Only listen if not already listening
+    if (_webSocketSubscription == null) {
+      _webSocketSubscription = channel!.stream.listen(
+            (data) {
+          final decoded = jsonDecode(data);
+          ref.read(connectedChildsStatusProvider.notifier).state = decoded['children'];
+          print("Active Status: ${decoded['children']}");
+        },
+        onError: (error) {
+          print("WebSocket error: $error");
+        },
+        onDone: () {
+          print("WebSocket connection closed.");
+          _webSocketSubscription = null; // reset on close
+        },
+        cancelOnError: true,
+      );
+    } else {
+      print("Already listening to WebSocket.");
+    }
   }
+
   void initDashboard() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.get('authToken');
@@ -68,9 +75,20 @@ class _parentDashboardState extends ConsumerState<parentDashboard> {
     ref.read(parentEmailProvider.notifier).state = parentEmail;
     ref.read(connectedChildsProvider.notifier).state = connectedChilds;
     ref.read(currentChildProvider.notifier).state = connectedChilds![0];
+    final Map<String, String?> childImagesMap = {};
+
+    for (int i = 0; i < connectedChilds!.length; i++) {
+      final childKey = connectedChilds![i];
+      final imagePath = prefs.getString(childKey);
+      childImagesMap[childKey] = imagePath;
+    }
+    print("Child Image : "+childImagesMap.toString());
+    ref.read(connectedChildsImageProvider.notifier).state=childImagesMap;
+    ref.read(connectedChildsNameProvider.notifier).state=await childApiService.getChildNamesByConnections(connectedChilds!);
     setState(() {
       isLoading = false;
     });
+
 
     connectToWebSocket();
   }
@@ -97,6 +115,15 @@ class _parentDashboardState extends ConsumerState<parentDashboard> {
                 children: [
                   InkWell(
                       onTap: () {
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          '/parentDashboard',
+                              (Route<dynamic> route) => false,
+                        );
+                      },
+                      child: Icon(Icons.refresh, color: Colors.white)),
+                  InkWell(
+                      onTap: () {
                         // Navigator.pushNamed(context, '/childSettings');
                       },
                       child: Icon(Icons.settings_rounded, color: Colors.white)),
@@ -116,7 +143,7 @@ class _parentDashboardState extends ConsumerState<parentDashboard> {
                 ),
                 !isLoading
                     ? LiveMap()
-                    : Text("Map"),
+                    : SizedBox(height: 300, child: Center(child: CircularProgressIndicator(),),),
                 SizedBox(
                   height: 30,
                 ),
@@ -168,7 +195,7 @@ class _parentDashboardState extends ConsumerState<parentDashboard> {
                                   boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 4)],
                                 ),
                                 child: Text(
-                                  connectedChilds?[index] ?? "No Connected Childs",
+                                  ref.watch(connectedChildsNameProvider)?[connectedChilds?[index]] ?? "No Connected Childs",
                                   style: TextStyle(
                                     fontSize: 15,
                                     color: Colors.white,

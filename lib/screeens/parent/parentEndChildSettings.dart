@@ -76,10 +76,11 @@ class _ParentEndChildSettingsState extends ConsumerState<ParentEndChildSettings>
           ListTile(
             leading: const Icon(Icons.person, color: Color(0xFF373E4E)),
             title: const Text("Kid’s nickname and avatar"),
-            subtitle: const Text("Vhh"),
+            subtitle:  Text(ref.read(connectedChildsNameProvider)?[ref.read(currentChildProvider)]),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: () {
-              // Navigate to kid's profile settings
+            onTap: (){
+
+               Navigator.pushNamed(context, '/parentEndChildDetails');
             },
           ),
           const Divider(indent: 16, endIndent: 16),
@@ -88,7 +89,7 @@ class _ParentEndChildSettingsState extends ConsumerState<ParentEndChildSettings>
             title: const Text("Parent list"),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () {
-              // Navigate to parent list
+              Navigator.pushNamed(context, '/ParentListScreen');
             },
           ),
           const Divider(indent: 16, endIndent: 16),

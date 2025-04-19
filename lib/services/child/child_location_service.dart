@@ -8,8 +8,8 @@ import '../../core/api_constants.dart';
 Stream<Position> getLiveLocation() {
   return Geolocator.getPositionStream(
     locationSettings: const LocationSettings(
-      accuracy: LocationAccuracy.high,
-      distanceFilter: 0, // meters
+      accuracy: LocationAccuracy.best,
+      distanceFilter: 10, // meters
     ),
   );
 }
@@ -60,23 +60,42 @@ void reconnect() {
   }
 }
 
-
 void startSharingLocation() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var childId = prefs.getString('connectionString');
   connectWebSocket();
 
+  DateTime now = DateTime.now();
+  String todayKey = "${now.year}-${now.month}-${now.day}";
+  String? savedDate = prefs.getString('maxSpeedDate');
+  double maxSpeed = prefs.getDouble('maxSpeed') ?? 0.0;
 
+  // Reset max speed if date changed
+  if (savedDate != todayKey) {
+    await prefs.setString('maxSpeedDate', todayKey);
+    await prefs.setDouble('maxSpeed', 0.0);
+    maxSpeed = 0.0;
+  }
 
-  getLiveLocation().listen((Position position) {
+  getLiveLocation().listen((Position position) async {
+    double speedKmph = position.speed * 3.6;
+
+    // Update max speed if current speed is higher
+    if (speedKmph > maxSpeed) {
+      maxSpeed = speedKmph;
+      await prefs.setDouble('maxSpeed', maxSpeed);
+    }
+
     if (channel != null) {
-      print("Longitude: ${position.longitude}, Latitude: ${position.latitude}, Speed: ${position.speed}");
+      print("Longitude: ${position.longitude}, Latitude: ${position.latitude}, Speed: $speedKmph, MaxSpeedToday: $maxSpeed");
+
       channel!.sink.add(jsonEncode({
         'type': 'location_update',
         'childId': childId,
         'latitude': position.latitude,
         'longitude': position.longitude,
-        'speed': position.speed,
+        'speed': speedKmph,
+        'maxSpeed': maxSpeed,
       }));
     }
   });

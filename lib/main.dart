@@ -4,12 +4,14 @@ import 'package:childcompass/screeens/child/child_code.dart';
 import 'package:childcompass/screeens/child/child_dashboard.dart';
 import 'package:childcompass/screeens/child/child_registeration.dart';
 import 'package:childcompass/screeens/mutual/onBoardingScreen.dart';
+import 'package:childcompass/screeens/parent/ParentEndChildDetails.dart';
 import 'package:childcompass/screeens/parent/child_connection.dart';
 import 'package:childcompass/screeens/parent/email_verification.dart';
 import 'package:childcompass/screeens/parent/parentEndChildSettings.dart';
 import 'package:childcompass/screeens/parent/parent_dashboard.dart';
 import 'package:childcompass/screeens/parent/parent_login.dart';
 import 'package:childcompass/screeens/parent/parent_registeration.dart';
+import 'package:childcompass/screeens/parent/parentsList.dart';
 import 'package:childcompass/services/parent/parent_api_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -96,6 +98,9 @@ class MyApp extends StatelessWidget  {
         '/childDashboard': (context) => childDashboard(),
         '/parentDashboard': (context) => parentDashboard(),
         '/parentEndChildSettings':(context)=>ParentEndChildSettings(),
+        '/parentEndChildDetails':(context)=>ChildSettingsScreen(),
+        '/ParentListScreen':(context)=>ParentListScreen(),
+
       },
     );
   }
