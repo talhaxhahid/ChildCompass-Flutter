@@ -143,7 +143,7 @@ class _parentDashboardState extends ConsumerState<parentDashboard> {
                   height: 30,
                 ),
                 !isLoading
-                    ? LiveMap(dashboardContext:context)
+                    ? LiveMap()
                     : SizedBox(height: 300, child: Center(child: CircularProgressIndicator(),),),
                 SizedBox(
                   height: 30,
@@ -152,6 +152,10 @@ class _parentDashboardState extends ConsumerState<parentDashboard> {
                 ParentDashboardButton(),
                 SizedBox(
                   height: 30,
+                ),
+                Text("Location History (24 Hours)" ,style: TextStyle(color: Color(0xFF373E4E) ,fontWeight: FontWeight.w900 ,fontFamily: 'Quantico' ,fontSize: 18),),
+                SizedBox(
+                  height: 15,
                 ),
                 !isLoading?HistoryMap()
                 : SizedBox(height: 300, child: Center(child: CircularProgressIndicator(),),),

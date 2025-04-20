@@ -38,7 +38,7 @@ double haversineDistance(double lat1, double lon1, double lat2, double lon2) {
 Stream<Position> getLiveLocation() {
   return Geolocator.getPositionStream(
     locationSettings: const LocationSettings(
-      accuracy: LocationAccuracy.best,
+      accuracy: LocationAccuracy.bestForNavigation,
       distanceFilter: 10, // meters
     ),
   );

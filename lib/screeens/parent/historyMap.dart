@@ -21,13 +21,13 @@ class HistoryMap extends ConsumerStatefulWidget {
 class _HistoryMapState extends ConsumerState<HistoryMap> {
   late StreamSubscription subscription;
    List<LatLng> historyCoordinates=[];
+   List<String> historyTimeStamp=[];
   GoogleMapController? _mapController;
   WebSocketChannel? channel = IOWebSocketChannel.connect(ApiConstants.locationSharingSocket);
   bool isReconnecting = false;
   bool isLoading = true;
   String time='never';
   Set<Marker> _markers = {};
-  Marker? _locationMarker;
   double _currentZoom = 17.0; // Track current zoom level
 
   @override
@@ -64,12 +64,13 @@ class _HistoryMapState extends ConsumerState<HistoryMap> {
             for(int i=0;i<history.length;i++)
               {
                 historyCoordinates.add( LatLng(history[i]['latitude'],history[i]['longitude']));
+                historyTimeStamp.add(history[i]['time']);
               }
 
             setState(() {
               _updateMarker();
               _mapController?.animateCamera(
-                CameraUpdate.newLatLngZoom(historyCoordinates[0], _currentZoom),
+                CameraUpdate.newLatLngZoom(historyCoordinates.last, _currentZoom),
               );
               isLoading=false;
 
@@ -110,17 +111,39 @@ class _HistoryMapState extends ConsumerState<HistoryMap> {
     String ImageUrl = ref.read(connectedChildsImageProvider)?[ref.read(currentChildProvider)]??" ";
 
     _markers.clear();
+    for(int i=0 ; i<historyCoordinates.length-1;i++)
+      {
+        _markers.add(
+          Marker(
+            markerId: MarkerId("Locationhistory$i"),
+            position: historyCoordinates[i],
+            icon: i==0?await CircleAvatar(backgroundColor: Colors.redAccent,radius: 22,).toBitmapDescriptor(
+                logicalSize: const Size(160, 160), imageSize: const Size(160, 160)
+            ):await CircleAvatar(backgroundColor: Colors.indigo.shade300,radius: 12,).toBitmapDescriptor(
+                logicalSize: const Size(160, 160), imageSize: const Size(160, 160)
+            ),
+            infoWindow: InfoWindow(
+              title: 'Location Time',
+              snippet: historyTimeStamp[i],
+              onTap: () {},
+
+            ),
+
+
+          ),
+        );
+      }
     _markers.add(
       Marker(
         markerId: const MarkerId('LastHistoryLocation'),
-        position: historyCoordinates[0],
+        position: historyCoordinates.last,
         icon: await PinWithAvatar(imageUrl:ImageUrl).toBitmapDescriptor(
             logicalSize: const Size(160, 160), imageSize: const Size(160, 160)
         ),
         infoWindow: InfoWindow(
-          title: 'Last Update',
-          snippet: time,
-          onTap: () {},
+
+          title: 'Location Time',
+          snippet: historyTimeStamp.last,
           // Use a custom widget for the info window
         ),
 
@@ -154,7 +177,7 @@ class _HistoryMapState extends ConsumerState<HistoryMap> {
         borderRadius: BorderRadius.circular(10),
         child:isLoading?Center(child: CircularProgressIndicator()): GoogleMap(
           initialCameraPosition: CameraPosition(
-            target: historyCoordinates[0],
+            target: historyCoordinates.last,
             zoom: _currentZoom,
           ),
           markers: _markers,
