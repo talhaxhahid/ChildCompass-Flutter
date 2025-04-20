@@ -12,6 +12,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import '../../core/api_constants.dart';
 import '../../services/child/child_api_service.dart';
 import '../../services/parent/parent_api_service.dart';
+import 'historyMap.dart';
 
 class parentDashboard extends ConsumerStatefulWidget {
   @override
@@ -142,12 +143,18 @@ class _parentDashboardState extends ConsumerState<parentDashboard> {
                   height: 30,
                 ),
                 !isLoading
-                    ? LiveMap()
+                    ? LiveMap(dashboardContext:context)
                     : SizedBox(height: 300, child: Center(child: CircularProgressIndicator(),),),
                 SizedBox(
                   height: 30,
                 ),
+
                 ParentDashboardButton(),
+                SizedBox(
+                  height: 30,
+                ),
+                !isLoading?HistoryMap()
+                : SizedBox(height: 300, child: Center(child: CircularProgressIndicator(),),),
               ],
             ),
           ),

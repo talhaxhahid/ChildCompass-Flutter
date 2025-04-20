@@ -1,4 +1,6 @@
 import 'package:childcompass/provider/parent_provider.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -10,6 +12,8 @@ import '../../core/api_constants.dart';
 import 'avatarPin.dart';
 
 class LiveMap extends ConsumerStatefulWidget {
+  final BuildContext dashboardContext;
+  LiveMap({required this.dashboardContext});
   @override
   _LiveMapState createState() => _LiveMapState();
 }
@@ -145,26 +149,38 @@ class _LiveMapState extends ConsumerState<LiveMap> {
       height: 300,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10),
-        child:isLoading?Center(child: CircularProgressIndicator()): GoogleMap(
-          initialCameraPosition: CameraPosition(
-            target: _currentLocation,
-            zoom: _currentZoom,
+        child:isLoading?Center(child: CircularProgressIndicator()): Listener(
+          behavior: HitTestBehavior.opaque,
+          onPointerMove: (_) {
+            // This prevents scrolling when interacting with the map
+            PrimaryScrollController.of(widget.dashboardContext)?.position.pixels;
+          },
+          child: GoogleMap(
+            initialCameraPosition: CameraPosition(
+              target: _currentLocation,
+              zoom: _currentZoom,
+            ),
+            markers: _markers,
+            gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+              Factory<OneSequenceGestureRecognizer>(
+                    () => EagerGestureRecognizer(),
+              ),
+            }.toSet(),
+            onMapCreated: (GoogleMapController controller) {
+              _mapController = controller;
+              // Track zoom level changes
+              controller.getZoomLevel().then((zoom) {
+                _currentZoom = zoom;
+              });
+            },
+            onCameraMove: (CameraPosition position) {
+              // Update current zoom level whenever the camera moves
+              _currentZoom = position.zoom;
+            },
+            myLocationEnabled: false,
+            myLocationButtonEnabled: false,
+            zoomControlsEnabled: false,
           ),
-          markers: _markers,
-          onMapCreated: (GoogleMapController controller) {
-            _mapController = controller;
-            // Track zoom level changes
-            controller.getZoomLevel().then((zoom) {
-              _currentZoom = zoom;
-            });
-          },
-          onCameraMove: (CameraPosition position) {
-            // Update current zoom level whenever the camera moves
-            _currentZoom = position.zoom;
-          },
-          myLocationEnabled: false,
-          myLocationButtonEnabled: false,
-          zoomControlsEnabled: false,
         ),
       ),
     );
