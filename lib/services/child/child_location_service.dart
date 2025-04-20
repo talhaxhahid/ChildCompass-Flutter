@@ -122,13 +122,13 @@ void startSharingLocation() async {
 
     // Check if we need to log history
     bool shouldLogHistory = false;
-
+    double distance=0;
     if (lastHistoryLocation == null) {
       // First location update, always log as history
       shouldLogHistory = true;
     } else {
       // Calculate distance from last history location
-      double distance = haversineDistance(
+        distance = haversineDistance(
         lastHistoryLocation!.latitude,
         lastHistoryLocation!.longitude,
         position.latitude,
@@ -153,7 +153,7 @@ void startSharingLocation() async {
 
     if (channel != null) {
       print("Longitude: ${position.longitude}, Latitude: ${position.latitude}, "
-          "Speed: $speedKmph, MaxSpeedToday: $maxSpeed, History: $shouldLogHistory");
+          "Speed: $speedKmph, MaxSpeedToday: $maxSpeed, History: $shouldLogHistory , Distance: $distance");
 
       channel!.sink.add(jsonEncode({
         'type': 'location_update',
@@ -163,6 +163,7 @@ void startSharingLocation() async {
         'speed': speedKmph,
         'maxSpeed': maxSpeed,
         'history': shouldLogHistory,
+        'distance':distance/1000,
       }));
     }
   });

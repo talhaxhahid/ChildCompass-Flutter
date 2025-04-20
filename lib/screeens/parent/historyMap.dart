@@ -27,6 +27,7 @@ class _HistoryMapState extends ConsumerState<HistoryMap> {
   bool isReconnecting = false;
   bool isLoading = true;
   String time='never';
+  dynamic distanceCovered =0;
   Set<Marker> _markers = {};
   double _currentZoom = 17.0; // Track current zoom level
 
@@ -59,6 +60,7 @@ class _HistoryMapState extends ConsumerState<HistoryMap> {
           final decoded = jsonDecode(data);
           final history = decoded['history'];
           final child = decoded['childId'];
+          distanceCovered= decoded['distance'];
           if(ref.watch(currentChildProvider)==child){
             historyCoordinates=[];
             for(int i=0;i<history.length;i++)
@@ -167,42 +169,67 @@ class _HistoryMapState extends ConsumerState<HistoryMap> {
       }
     });
 
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(width: 1, color: const Color(0xFF373E4E)),
-      ),
-      height: 300,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child:isLoading?Center(child: CircularProgressIndicator()): GoogleMap(
-          initialCameraPosition: CameraPosition(
-            target: historyCoordinates.last,
-            zoom: _currentZoom,
+    return Column(
+      spacing: 10,
+      children: [
+        Container(
+          height: 60,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: const Color(0xFFEAF2FF),
+            border: Border.all(width: 1, color: const Color(0xFF373E4E)),
           ),
-          markers: _markers,
-          gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
-            Factory<OneSequenceGestureRecognizer>(
-                  () => EagerGestureRecognizer(),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text("Distance Covered :" ,style: TextStyle(fontWeight: FontWeight.bold ,fontFamily: 'Quantico'),),
+                Text(distanceCovered.toStringAsFixed(2)+" Km",style: TextStyle(fontWeight: FontWeight.bold ,fontFamily: 'Quantico'),),
+
+              ],
             ),
-          }.toSet(),
-          polylines: _getPolyline(),
-          onMapCreated: (GoogleMapController controller) {
-            _mapController = controller;
-            // Track zoom level changes
-            controller.getZoomLevel().then((zoom) {
-              _currentZoom = zoom;
-            });
-          },
-          onCameraMove: (CameraPosition position) {
-            // Update current zoom level whenever the camera moves
-            _currentZoom = position.zoom;
-          },
-          myLocationEnabled: false,
-          myLocationButtonEnabled: false,
-          zoomControlsEnabled: false,
+          ),
         ),
-      ),
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(width: 1, color: const Color(0xFF373E4E)),
+          ),
+          height: 300,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child:isLoading?Center(child: CircularProgressIndicator()): GoogleMap(
+              initialCameraPosition: CameraPosition(
+                target: historyCoordinates.last,
+                zoom: _currentZoom,
+              ),
+              markers: _markers,
+              gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+                Factory<OneSequenceGestureRecognizer>(
+                      () => EagerGestureRecognizer(),
+                ),
+              }.toSet(),
+              polylines: _getPolyline(),
+              onMapCreated: (GoogleMapController controller) {
+                _mapController = controller;
+                // Track zoom level changes
+                controller.getZoomLevel().then((zoom) {
+                  _currentZoom = zoom;
+                });
+              },
+              onCameraMove: (CameraPosition position) {
+                // Update current zoom level whenever the camera moves
+                _currentZoom = position.zoom;
+              },
+              myLocationEnabled: false,
+              myLocationButtonEnabled: false,
+              zoomControlsEnabled: false,
+            ),
+          ),
+        ),
+      ],
     );
   }
 

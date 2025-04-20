@@ -1,0 +1,2 @@
+D:/ChildCompass/flutter/android/app/.cxx/Debug/43acp6r6/x86/CMakeFiles/edit_cache.dir
+D:/ChildCompass/flutter/android/app/.cxx/Debug/43acp6r6/x86/CMakeFiles/rebuild_cache.dir

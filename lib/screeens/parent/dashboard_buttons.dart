@@ -44,15 +44,20 @@ class _ParentDashboardButtonState extends ConsumerState<ParentDashboardButton> {
           ),
 
           // Chat Button
-          Container(
-            width: 100,
-            height: 60,
-            decoration: BoxDecoration(
-              color: const Color(0xFF2D2D2D),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: const Center(
-              child: Icon(Icons.chat_bubble_outline, color: Colors.white, size: 28),
+          GestureDetector(
+            onTap: (){
+              Navigator.pushNamed(context, '/appUseage');
+            },
+            child: Container(
+              width: 100,
+              height: 60,
+              decoration: BoxDecoration(
+                color: const Color(0xFF2D2D2D),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: const Center(
+                child: Icon(Icons.chat_bubble_outline, color: Colors.white, size: 28),
+              ),
             ),
           ),
 

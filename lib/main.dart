@@ -5,6 +5,7 @@ import 'package:childcompass/screeens/child/child_dashboard.dart';
 import 'package:childcompass/screeens/child/child_registeration.dart';
 import 'package:childcompass/screeens/mutual/onBoardingScreen.dart';
 import 'package:childcompass/screeens/parent/ParentEndChildDetails.dart';
+import 'package:childcompass/screeens/parent/appUsage.dart';
 import 'package:childcompass/screeens/parent/child_connection.dart';
 import 'package:childcompass/screeens/parent/email_verification.dart';
 import 'package:childcompass/screeens/parent/parentEndChildSettings.dart';
@@ -100,6 +101,7 @@ class MyApp extends StatelessWidget  {
         '/parentEndChildSettings':(context)=>ParentEndChildSettings(),
         '/parentEndChildDetails':(context)=>ChildSettingsScreen(),
         '/ParentListScreen':(context)=>ParentListScreen(),
+        '/appUseage':(context)=>AppUsageApp()
 
       },
     );
