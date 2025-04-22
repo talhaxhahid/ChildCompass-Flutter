@@ -12,6 +12,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import '../../core/api_constants.dart';
 import '../../services/child/child_api_service.dart';
 import '../../services/parent/parent_api_service.dart';
+import 'appUsage.dart';
 import 'historyMap.dart';
 
 class parentDashboard extends ConsumerStatefulWidget {
@@ -150,6 +151,12 @@ class _parentDashboardState extends ConsumerState<parentDashboard> {
                 ),
 
                 ParentDashboardButton(),
+                SizedBox(
+                  height: 30,
+                ),
+                !isLoading?AppUsageList()
+                    : SizedBox(height: 300, child: Center(child: CircularProgressIndicator(),),),
+
                 SizedBox(
                   height: 30,
                 ),

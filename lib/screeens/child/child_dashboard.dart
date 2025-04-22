@@ -12,6 +12,7 @@ class childDashboard extends StatefulWidget {
 class _childDashboardState extends State<childDashboard> {
   var childName;
   var childCode;
+  var grantedPermissions =false;
 
   @override
   void initState() {
@@ -30,8 +31,10 @@ class _childDashboardState extends State<childDashboard> {
 }
 
   Future<void> _requestPermissions() async {
-    await permissions.requestLocationPermissions();
-    ChildBackgroundService();
+     grantedPermissions= await permissions.grantRequiredPermissions();
+    // if( grantedPermissions){
+    // ChildBackgroundService();}
+     ChildBackgroundService();
 
   }
 

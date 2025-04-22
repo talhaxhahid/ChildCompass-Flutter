@@ -71,32 +71,37 @@ class _ParentDashboardButtonState extends ConsumerState<ParentDashboardButton> {
             ),
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
-              children: const [
-                Icon(Icons.battery_5_bar_rounded, color: Colors.white, size: 28),
+              children:  [
+                _getBatteryIcon(ref.watch(batteryProvider)!),
                 SizedBox(width: 10),
-                Text("37%", style: TextStyle(color: Colors.white, fontSize: 16,fontFamily: "Quantico",)),
+                Text(ref.watch(batteryProvider).toString()+"%", style: TextStyle(color: Colors.white, fontSize: 16,fontFamily: "Quantico",)),
               ],
             ),
           ),
 
           // Geo-fence Button
-          Container(
-            width: 220,
-            height: 60,
-            decoration: BoxDecoration(
-              color: const Color(0xFF2D6F78),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: const [
-                Icon(Icons.location_on_outlined, color: Colors.white, size: 28),
-                SizedBox(width: 12),
-                Text(
-                  "Geo-fence Locations",
-                  style: TextStyle(color: Colors.white, fontSize: 14,fontFamily: "Quantico",),
-                ),
-              ],
+          GestureDetector(
+            onTap: (){
+              Navigator.pushNamed(context, '/GeofenceSetupScreen');
+            },
+            child: Container(
+              width: 220,
+              height: 60,
+              decoration: BoxDecoration(
+                color: const Color(0xFF2D6F78),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: const [
+                  Icon(Icons.location_on_outlined, color: Colors.white, size: 28),
+                  SizedBox(width: 12),
+                  Text(
+                    "Geo-fence Locations",
+                    style: TextStyle(color: Colors.white, fontSize: 14,fontFamily: "Quantico",),
+                  ),
+                ],
+              ),
             ),
           ),
 
@@ -148,4 +153,16 @@ class _ParentDashboardButtonState extends ConsumerState<ParentDashboardButton> {
       ),
     );
   }
+}
+// Helper function to get the appropriate battery icon
+Icon _getBatteryIcon(String battery) {
+  var batteryPercent =int.parse(battery);
+  if (batteryPercent >= 90) return const Icon(Icons.battery_full_rounded, color: Colors.white, size: 28);
+  if (batteryPercent >= 70) return const Icon(Icons.battery_6_bar_rounded, color: Colors.white, size: 28);
+  if (batteryPercent >= 50) return const Icon(Icons.battery_5_bar_rounded, color: Colors.white, size: 28);
+  if (batteryPercent >= 30) return const Icon(Icons.battery_4_bar_rounded, color: Colors.white, size: 28);
+  if (batteryPercent >= 15) return const Icon(Icons.battery_3_bar_rounded, color: Colors.white, size: 28);
+  if (batteryPercent >= 5) return const Icon(Icons.battery_2_bar_rounded, color: Colors.white, size: 28);
+  if (batteryPercent > 0) return const Icon(Icons.battery_1_bar_rounded, color: Colors.white, size: 28);
+  return const Icon(Icons.battery_0_bar_rounded, color: Colors.red, size: 28);
 }

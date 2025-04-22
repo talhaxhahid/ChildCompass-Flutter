@@ -112,6 +112,7 @@ void startSharingLocation() async {
   DateTime? lastHistoryTime;
 
   getLiveLocation().listen((Position position) async {
+
     double speedKmph = position.speed * 3.6;
 
     // Update max speed if current speed is higher

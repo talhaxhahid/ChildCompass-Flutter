@@ -17,6 +17,7 @@ class ApiConstants {
 
   static const String childRegisteration = "$baseUrl/child/register";
   static const String childNamesByConnection = "$baseUrl/child/names-by-connection";
+   static const String logAppUseage = "$baseUrl/child/logAppUsage";
 
 
 

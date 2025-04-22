@@ -1,178 +1,103 @@
+import 'package:childcompass/provider/parent_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:usage_stats/usage_stats.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class AppUsageApp extends StatefulWidget {
+import '../../services/child/child_api_service.dart';
+
+class AppUsageList extends ConsumerStatefulWidget {
   @override
-  AppUsageAppState createState() => AppUsageAppState();
+  ConsumerState<AppUsageList> createState() => _AppUsageListState();
 }
 
-class AppUsageAppState extends State<AppUsageApp> {
-  List<AppUsageInfo> appUsageList = [];
-  bool isLoading = true;
-  String errorMessage = '';
-
+class _AppUsageListState extends ConsumerState<AppUsageList> {
+  bool isLoading=true;
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
-    _fetchAppUsageData();
+
+
+    Future.microtask((){
+      GetAppUsage();
+    });
+
   }
 
-  Future<void> _fetchAppUsageData() async {
-    try {
-      // Request permission if not already granted
-      bool hasPermission = await UsageStats.checkUsagePermission() ?? false;
-      if (!hasPermission) {
-        await UsageStats.grantUsagePermission();
-      }
+  Future<void> GetAppUsage() async {
 
-      // Set time range (last 24 hours)
-      DateTime endDate = DateTime.now();
-      DateTime startDate = endDate.subtract(const Duration(hours: 24));
+    isLoading=true;
+    final Data= await childApiService.getChildUsage(ref.watch(currentChildProvider)!);
+    appUsageData=Data!['appUseage'];
+    ref.read(batteryProvider.notifier).state=Data!['battery'].toString();
 
-      // Query usage stats
-      List<UsageInfo> usageStats = await UsageStats.queryUsageStats(startDate, endDate);
-
-      // Create a map to aggregate usage time by package name
-      Map<String, AppUsageInfo> appUsageMap = {};
-
-      for (var info in usageStats) {
-        if (info.packageName == null || info.totalTimeInForeground == null) continue;
-
-        int timeInForeground = int.tryParse(info.totalTimeInForeground!) ?? 0;
-        if (timeInForeground <= 0) continue;
-
-        int lastTimeUsed = int.tryParse(info.lastTimeUsed ?? '0') ?? 0;
-
-        // If we already have this app in our map, add to its time
-        if (appUsageMap.containsKey(info.packageName)) {
-          appUsageMap[info.packageName!] = AppUsageInfo(
-            packageName: info.packageName!,
-            appName: appUsageMap[info.packageName]!.appName,
-            totalTimeInForeground: appUsageMap[info.packageName]!.totalTimeInForeground + timeInForeground,
-            lastTimeUsed: lastTimeUsed > appUsageMap[info.packageName]!.lastTimeUsed
-                ? lastTimeUsed
-                : appUsageMap[info.packageName]!.lastTimeUsed,
-          );
-        } else {
-          // First time seeing this app
-          appUsageMap[info.packageName!] = AppUsageInfo(
-            packageName: info.packageName!,
-            appName: _getAppName(info.packageName),
-            totalTimeInForeground: timeInForeground,
-            lastTimeUsed: lastTimeUsed,
-          );
-        }
-      }
-
-      // Convert map values to list and sort by usage time
-      List<AppUsageInfo> aggregatedList = appUsageMap.values.toList();
-      aggregatedList.sort((a, b) => b.totalTimeInForeground.compareTo(a.totalTimeInForeground));
-
-      setState(() {
-        appUsageList = aggregatedList;
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        errorMessage = 'Error fetching usage data: ${e.toString()}';
-        isLoading = false;
-      });
-    }
+    setState(() {
+      isLoading=false;
+    });
   }
 
-  // Helper method to get app name from package name
-  String _getAppName(String? packageName) {
-    if (packageName == null) return 'Unknown';
-
-    // Remove common package prefixes
-    String name = packageName
-        .replaceAll('com.android.', '')
-        .replaceAll('com.google.', '')
-        .replaceAll('com.', '')
-        .replaceAll('org.', '')
-        .replaceAll('io.', '');
-
-    // Capitalize first letters of each word
-    return name.split('.').map((s) => s.isNotEmpty
-        ? s[0].toUpperCase() + s.substring(1)
-        : '').join(' ');
-  }
-
-  // Format milliseconds to readable time
-  String _formatDuration(int milliseconds) {
-    Duration duration = Duration(milliseconds: milliseconds);
-    if (duration.inHours > 0) {
-      return "${duration.inHours}h ${duration.inMinutes.remainder(60)}m";
-    } else if (duration.inMinutes > 0) {
-      return "${duration.inMinutes}m ${duration.inSeconds.remainder(60)}s";
-    } else {
-      return "${duration.inSeconds}s";
-    }
-  }
+   late List<dynamic> appUsageData ;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("App Usage Statistics"),
-        actions: [
-          IconButton(
-            onPressed: _fetchAppUsageData,
-            icon: const Icon(Icons.refresh),
-          ),
-          IconButton(
-            onPressed: UsageStats.grantUsagePermission,
-            icon: const Icon(Icons.settings),
-          ),
-        ],
-      ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : errorMessage.isNotEmpty
-          ? Center(child: Text(errorMessage))
-          : RefreshIndicator(
-        onRefresh: _fetchAppUsageData,
-        child: ListView.builder(
-          itemCount: appUsageList.length,
-          itemBuilder: (context, index) {
-            final app = appUsageList[index];
-            return Card(
-              margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              child: ListTile(
-                title: Text(app.appName),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Package: ${app.packageName}'),
-                    const SizedBox(height: 4),
-                    Text('Usage Time: ${_formatDuration(app.totalTimeInForeground)}'),
-                    Text('Last Used: ${DateTime.fromMillisecondsSinceEpoch(app.lastTimeUsed).toString().substring(0, 16)}'),
-                  ],
-                ),
-                leading: const Icon(Icons.apps),
-                trailing: Text(
-                  '${(app.totalTimeInForeground / 3600000).toStringAsFixed(1)}h',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          },
+    return Column(
+
+      children: [
+        Text("App Useage (24 Hours)" ,style: TextStyle(color: Color(0xFF373E4E) ,fontWeight: FontWeight.w900 ,fontFamily: 'Quantico' ,fontSize: 18),),
+        SizedBox(
+          height: 15,
         ),
-      ),
+        Container(
+          height: 300,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.2),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: Offset(0, 3),
+              ),
+            ],
+          ),
+          child: isLoading? Center(child: CircularProgressIndicator()) :ListView.separated(
+            separatorBuilder: (context, index) =>  Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Container(color: Colors.black45, height: 0.3),
+            ),
+            padding: EdgeInsets.all(8),
+            itemCount: appUsageData.length,
+            itemBuilder: (context, index) {
+              final app = appUsageData[index];
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage: NetworkImage(app['imageUrl']!),
+                    radius: 24,
+                  ),
+                  title: Text(
+                    app['appName']!,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 4),
+                      Text('Total: ${app['totalTimeInForeground']}'),
+                      Text('Last used: ${app['lastTimeUsed']}'),
+                    ],
+                  ),
+                  trailing: Icon(Icons.chevron_right, color: Colors.grey),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
-}
-
-class AppUsageInfo {
-  final String packageName;
-  final String appName;
-  final int totalTimeInForeground; // in milliseconds
-  final int lastTimeUsed; // timestamp in milliseconds
-
-  AppUsageInfo({
-    required this.packageName,
-    required this.appName,
-    required this.totalTimeInForeground,
-    required this.lastTimeUsed,
-  });
 }

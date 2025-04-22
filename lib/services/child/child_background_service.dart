@@ -1,7 +1,6 @@
 import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:flutter_background_service_android/flutter_background_service_android.dart';
-
 import 'childActiveStatusService.dart';
+import 'child_appUseage_service.dart';
 import 'child_location_service.dart';
 
 
@@ -27,6 +26,8 @@ void onStart(ServiceInstance service) {
 
   startSharingLocation();
   ChildActiveStatusService().start();
+  ChildAppUsage().LogAppUseage();
+
 
 
   service.on("stopService").listen((event) {

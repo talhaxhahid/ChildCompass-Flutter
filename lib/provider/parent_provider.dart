@@ -17,6 +17,8 @@ final currentChildProvider= StateProvider<String?>((ref) => null);
 
 final speedProvider = StateProvider<String?>((ref) => "0");
 
+final batteryProvider = StateProvider<String?>((ref) => "0");
+
 final maxSpeedProvider = StateProvider<String?>((ref) => "0");
 
 
