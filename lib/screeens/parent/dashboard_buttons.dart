@@ -82,7 +82,7 @@ class _ParentDashboardButtonState extends ConsumerState<ParentDashboardButton> {
           // Geo-fence Button
           GestureDetector(
             onTap: (){
-              Navigator.pushNamed(context, '/GeofenceSetupScreen');
+              Navigator.pushNamed(context, '/GeofenceListScreen');
             },
             child: Container(
               width: 220,

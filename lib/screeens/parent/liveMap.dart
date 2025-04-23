@@ -9,6 +9,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:widget_to_marker/widget_to_marker.dart';
 import 'dart:convert';
 import '../../core/api_constants.dart';
+import '../../services/child/child_api_service.dart';
 import 'avatarPin.dart';
 
 class LiveMap extends ConsumerStatefulWidget {
@@ -25,13 +26,137 @@ class _LiveMapState extends ConsumerState<LiveMap> {
   bool isLoading = true;
   String time='never';
   Set<Marker> _markers = {};
+  Set<Circle> _circles={};
+  List<dynamic> _geofences = [];
   Marker? _locationMarker;
-  double _currentZoom = 17.0; // Track current zoom level
+  double _currentZoom = 16.8; // Track current zoom level
+  final String mapStyle = ''' 
+[
+  {
+    "featureType": "administrative.land_parcel",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative.neighborhood",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "labels.text",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.business",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "labels.text",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "labels",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "labels.text",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  }
+]
+''';
 
   @override
   void initState() {
     super.initState();
     Future.microtask((){ connectToWebSocket();
+      getGeofenceLocations();
+
+    });
+
+  }
+
+  Future<void> getGeofenceLocations() async {
+    final geofences = await childApiService
+        .getGeofenceLocations(ref.read(currentChildProvider)!);
+
+    if (geofences == null) {
+      return;
+    }
+
+      _geofences = geofences;
+      _updateCircles();
+
+
+  }
+
+  Future<void> _updateCircles() async {
+    _circles.clear();
+    _markers.removeWhere((marker) => marker.markerId.value.contains('geofence'));
+    print(_geofences);
+    var selectedPoint;
+    double circleRadius;
+    for(var i=0 ;i<_geofences.length;i++) {
+
+      selectedPoint= LatLng(_geofences[i]['latitude'],_geofences[i]['longitude'] );
+      circleRadius=_geofences[i]['radius'].toDouble();
+
+      if (selectedPoint != null) {
+        _circles.add(
+          Circle(
+            zIndex: 10,
+            circleId: CircleId('geofence$i'),
+            center: selectedPoint!,
+            radius: circleRadius,
+            fillColor: Color(0xFF373E4E).withOpacity(0.5),
+            strokeColor: Color(0xFF373E4E),
+            strokeWidth: 2,
+          ),
+        );
+
+        _markers.add(
+          Marker(
+              markerId:  MarkerId('geofence$i'),
+              position: selectedPoint,
+              icon: await Container(decoration: BoxDecoration(color: Color(0xFF373E4E),borderRadius: BorderRadius.circular(10)), child:Text(_geofences[i]['name'],style: TextStyle(color: Colors.white ,fontSize: 28 ,fontWeight: FontWeight.bold),), padding: EdgeInsets.symmetric(horizontal: 30,vertical: 10), ).toBitmapDescriptor(
+              logicalSize: const Size(160, 160), imageSize: const Size(160, 160)
+          ),
+
+        ),
+    );
+
+      }
+    }
+    setState(() {
 
     });
 
@@ -105,7 +230,8 @@ class _LiveMapState extends ConsumerState<LiveMap> {
   void _updateMarker() async {
     String ImageUrl = ref.read(connectedChildsImageProvider)?[ref.read(currentChildProvider)]??" ";
 
-    _markers.clear();
+    // _markers.clear();
+    _markers.removeWhere((marker) => marker.markerId.value == 'currentLocation');
     _markers.add(
       Marker(
         markerId: const MarkerId('currentLocation'),
@@ -123,6 +249,7 @@ class _LiveMapState extends ConsumerState<LiveMap> {
         // BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
       ),
     );
+    print("Length of Markers array = ${_markers.length}");
     setState(()  {
     });
   }
@@ -137,6 +264,7 @@ class _LiveMapState extends ConsumerState<LiveMap> {
           'targetchildId': next,
           'parentId': ref.read(parentEmailProvider),
         }));
+        getGeofenceLocations();
       }
     });
 
@@ -149,11 +277,15 @@ class _LiveMapState extends ConsumerState<LiveMap> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10),
         child:isLoading?Center(child: CircularProgressIndicator()): GoogleMap(
+          mapType: MapType.normal,
+          style: mapStyle,
           initialCameraPosition: CameraPosition(
+            tilt: 55,
             target: _currentLocation,
             zoom: _currentZoom,
           ),
           markers: _markers,
+          circles: _circles,
           gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
             Factory<OneSequenceGestureRecognizer>(
                   () => EagerGestureRecognizer(),

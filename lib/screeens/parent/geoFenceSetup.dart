@@ -1,15 +1,20 @@
+import 'package:childcompass/provider/parent_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:widget_to_marker/widget_to_marker.dart';
 
-class GeofenceSetupScreen extends StatefulWidget {
+import '../../services/child/child_api_service.dart';
+
+class GeofenceSetupScreen extends ConsumerStatefulWidget {
   @override
   _GeofenceSetupScreenState createState() => _GeofenceSetupScreenState();
 }
 
-class _GeofenceSetupScreenState extends State<GeofenceSetupScreen> {
+class _GeofenceSetupScreenState extends ConsumerState<GeofenceSetupScreen> {
+  bool isSaving=false;
   late GoogleMapController mapController;
   LatLng? selectedPoint;
   double circleRadius = 80; // Default radius in meters
@@ -82,7 +87,11 @@ class _GeofenceSetupScreenState extends State<GeofenceSetupScreen> {
     });
   }
 
-  void _saveGeofence() {
+  Future<void> _saveGeofence() async {
+
+    setState(() {
+      isSaving=true;
+    });
     if (selectedPoint == null || locationNameController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Please select a location and enter a name')),
@@ -101,12 +110,25 @@ class _GeofenceSetupScreenState extends State<GeofenceSetupScreen> {
     print('Geofence saved: $geofenceData');
 
     // Show success message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Geofence saved successfully')),
-    );
+    String? childId = ref.read(currentChildProvider);
+    var Response=await childApiService.addGeofence(connectionString: childId!, geofence: geofenceData);
 
-    // Optionally navigate back
-    // Navigator.pop(context, geofenceData);
+    if(Response==true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Geofence saved successfully')),
+      );
+
+      // Optionally navigate back
+      Navigator.pop(context, true);
+    }
+    else{
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error : Unable to Save Geofence Location')),
+      );
+      setState(() {
+        isSaving=false;
+      });
+    }
   }
 
   @override
@@ -202,7 +224,7 @@ class _GeofenceSetupScreenState extends State<GeofenceSetupScreen> {
                   SizedBox(height: 24),
                   Center(
                     child: ElevatedButton(
-                      onPressed: _saveGeofence,
+                      onPressed: isSaving?(){}: _saveGeofence,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFF373E4E), // Background color
                         shape: RoundedRectangleBorder(
@@ -214,7 +236,7 @@ class _GeofenceSetupScreenState extends State<GeofenceSetupScreen> {
                           horizontal: 24.0,
                           vertical: 12.0,
                         ),
-                        child: Text(
+                        child: isSaving? CircularProgressIndicator()  :  Text(
                           'Save Geofence',
                           style: TextStyle(
                             color: Colors.white,

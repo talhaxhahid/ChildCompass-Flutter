@@ -17,7 +17,10 @@ class ApiConstants {
 
   static const String childRegisteration = "$baseUrl/child/register";
   static const String childNamesByConnection = "$baseUrl/child/names-by-connection";
-   static const String logAppUseage = "$baseUrl/child/logAppUsage";
+  static const String logAppUseage = "$baseUrl/child/logAppUsage";
+  static const String addGeofence = "$baseUrl/child/addGeofence";
+  static const String getGeofence = "$baseUrl/child/geofenceLocations";
+  static const String removeGeofence = "$baseUrl/child/remove-geofence";
 
 
 

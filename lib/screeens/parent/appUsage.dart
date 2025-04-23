@@ -25,7 +25,10 @@ class _AppUsageListState extends ConsumerState<AppUsageList> {
 
   Future<void> GetAppUsage() async {
 
-    isLoading=true;
+
+    setState(() {
+      isLoading=true;
+    });
     final Data= await childApiService.getChildUsage(ref.watch(currentChildProvider)!);
     appUsageData=Data!['appUseage'];
     ref.read(batteryProvider.notifier).state=Data!['battery'].toString();
@@ -39,6 +42,11 @@ class _AppUsageListState extends ConsumerState<AppUsageList> {
 
   @override
   Widget build(BuildContext context) {
+
+    ref.listen<String?>(currentChildProvider, (previous, next) {
+       GetAppUsage();
+
+    });
     return Column(
 
       children: [

@@ -8,6 +8,7 @@ import 'package:childcompass/screeens/parent/ParentEndChildDetails.dart';
 import 'package:childcompass/screeens/parent/child_connection.dart';
 import 'package:childcompass/screeens/parent/email_verification.dart';
 import 'package:childcompass/screeens/parent/geoFenceSetup.dart';
+import 'package:childcompass/screeens/parent/geofenceLocations.dart';
 import 'package:childcompass/screeens/parent/parentEndChildSettings.dart';
 import 'package:childcompass/screeens/parent/parent_dashboard.dart';
 import 'package:childcompass/screeens/parent/parent_login.dart';
@@ -101,6 +102,7 @@ class MyApp extends StatelessWidget  {
         '/parentEndChildDetails':(context)=>ChildSettingsScreen(),
         '/ParentListScreen':(context)=>ParentListScreen(),
         '/GeofenceSetupScreen':(context)=>GeofenceSetupScreen(),
+        '/GeofenceListScreen':(context)=>GeofenceListScreen(),
 
 
       },
