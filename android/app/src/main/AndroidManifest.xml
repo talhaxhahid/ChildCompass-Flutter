@@ -19,6 +19,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <application
 
+
         android:label="childcompass"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
@@ -54,6 +55,14 @@
         <service
             android:name="id.flutter.flutter_background_service.BackgroundService"
             android:foregroundServiceType="location|dataSync|mediaPlayback" />
+
+        <service
+            android:name="com.dexterous.flutterlocalnotifications.FlutterLocalNotificationsService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="FLUTTER_NOTIFICATION_CLICK" />
+            </intent-filter>
+        </service>
 
 
     </application>

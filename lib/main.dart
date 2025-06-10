@@ -3,6 +3,7 @@ import 'package:childcompass/provider/parent_provider.dart';
 import 'package:childcompass/screeens/child/child_code.dart';
 import 'package:childcompass/screeens/child/child_dashboard.dart';
 import 'package:childcompass/screeens/child/child_registeration.dart';
+import 'package:childcompass/screeens/child/child_taskscreen.dart';
 import 'package:childcompass/screeens/mutual/onBoardingScreen.dart';
 import 'package:childcompass/screeens/parent/ParentEndChildDetails.dart';
 import 'package:childcompass/screeens/parent/child_connection.dart';
@@ -14,14 +15,23 @@ import 'package:childcompass/screeens/parent/parent_dashboard.dart';
 import 'package:childcompass/screeens/parent/parent_login.dart';
 import 'package:childcompass/screeens/parent/parent_registeration.dart';
 import 'package:childcompass/screeens/parent/parentsList.dart';
+import 'package:childcompass/screeens/parent/parent_taskscreen.dart';
+import 'package:childcompass/services/firebaseMessaging.dart';
 import 'package:childcompass/services/parent/parent_api_service.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive/hive.dart';
 import 'package:flutter/material.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  await FirebaseMessagingService().initialize();
   //MapboxOptions.setAccessToken("pk.eyJ1IjoiZW1hd2F0c29uIiwiYSI6ImNtOGoyNzB5YjBhdDcyaXMzeTBjY2FiZ2sifQ.lhvhhMAAJktVCSXiDyF8Mg");
+  await Hive.initFlutter();
+  await Hive.openBox('tasksBox');
   String intial_route='/onBoardingScreen';
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var user = prefs.get('user');
@@ -103,6 +113,8 @@ class MyApp extends StatelessWidget  {
         '/ParentListScreen':(context)=>ParentListScreen(),
         '/GeofenceSetupScreen':(context)=>GeofenceSetupScreen(),
         '/GeofenceListScreen':(context)=>GeofenceListScreen(),
+        '/childTaskscreen': (context) => ChildTaskscreen(),
+        '/parentTaskScreen': (context) => ParentTaskScreen(),
 
 
       },

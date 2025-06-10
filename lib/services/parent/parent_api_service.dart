@@ -1,12 +1,17 @@
 import 'dart:convert';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'package:childcompass/core/api_constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class parentApiService {
 
 
   // Register API Call
   Future<Map<String, dynamic>?> registerParent(String name, String email, String password) async {
+    String? token = await FirebaseMessaging.instance.getToken();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('fcm', token!);
     try {
       final response = await http.post(
         Uri.parse(ApiConstants.parentRegister),
@@ -15,6 +20,7 @@ class parentApiService {
           "name": name.trim(),
           "email": email.trim(),
           "password": password,
+          "fcm":token
         }),
       );
 
@@ -61,13 +67,16 @@ class parentApiService {
 
   //LOGIN API
   Future<Map<String, dynamic>> loginParent(String email, String password) async {
+    String? token = await FirebaseMessaging.instance.getToken();
     final url = Uri.parse(ApiConstants.parentLogin); // API endpoint
     try {
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"email": email, "password": password}),
+        body: jsonEncode({"email": email, "password": password ,"fcm":token} ),
       );
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('fcm', token!);
 
       return jsonDecode(response.body);
     } catch (e) {
@@ -76,14 +85,20 @@ class parentApiService {
   }
 
  static Future<Map<String, dynamic>> parentDetails(String token) async {
+   String? fcmtoken = await FirebaseMessaging.instance.getToken();
+
     final url = Uri.parse(ApiConstants.parentDetails); // API endpoint
     try {
-      final response = await http.get(
+      final response = await http.post(
         url,
         headers: {"Content-Type": "application/json",'Authorization': 'Bearer $token'},
+        body: jsonEncode({"fcm":fcmtoken} ),
       );
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('fcm', fcmtoken!);
 
       return {"body":jsonDecode(response.body),"status":response.statusCode};
+
     } catch (e) {
       return {"message": "An error occurred: $e"};
     }

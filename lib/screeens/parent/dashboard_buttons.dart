@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../provider/parent_provider.dart';
+import '../mutual/messageScreen.dart';
 class ParentDashboardButton extends ConsumerStatefulWidget {
   const ParentDashboardButton({super.key});
 
@@ -46,7 +47,17 @@ class _ParentDashboardButtonState extends ConsumerState<ParentDashboardButton> {
           // Chat Button
           GestureDetector(
             onTap: (){
-              Navigator.pushNamed(context, '/appUseage');
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChatScreen(
+                    currentUserName: ref.read(parentNameProvider)!,
+                    currentUserId: ref.read(parentEmailProvider)!,
+                    otherUserId: ref.read(currentChildProvider)!,
+                    otherUserName: ref.read(connectedChildsNameProvider)![ref.read(currentChildProvider)],
+                  ),
+                ),
+              );
             },
             child: Container(
               width: 100,
@@ -106,31 +117,37 @@ class _ParentDashboardButtonState extends ConsumerState<ParentDashboardButton> {
           ),
 
           // Child Tasks Button
-          Container(
-            width: 240,
-            height: 60,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF44336),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.checklist_rounded, color: Colors.white, size: 28),
-                    SizedBox(width: 10),
-                    Text("Child Tasks", style: TextStyle(color: Colors.white, fontSize: 15,fontFamily: "Quantico",)),
-                  ],
-                ),
-                Container(width: 1, height: 40, color: Colors.white),
-                const Text("Complete\n3 / 5",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white, fontSize: 12,fontFamily: "Quantico",)),
-              ],
+          GestureDetector(
+            onTap: (){
+              Navigator.pushNamed(context, '/parentTaskScreen');
+            },
+            child: Container(
+
+              width: 240,
+              height: 60,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF44336),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.checklist_rounded, color: Colors.white, size: 28),
+                      SizedBox(width: 10),
+                      Text("Child Tasks", style: TextStyle(color: Colors.white, fontSize: 15,fontFamily: "Quantico",)),
+                    ],
+                  ),
+                  Container(width: 1, height: 40, color: Colors.white),
+                  const Text("Complete\n3 / 5",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white, fontSize: 12,fontFamily: "Quantico",)),
+                ],
+              ),
             ),
           ),
 

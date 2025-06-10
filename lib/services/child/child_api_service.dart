@@ -1,11 +1,16 @@
 import 'dart:convert';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'package:childcompass/core/api_constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class childApiService {
   // Register API Call
-  static Future<Map<String, dynamic>?> registerChild(
-      String name, String age, String gender) async {
+  static Future<Map<String, dynamic>?> registerChild(String name, String age, String gender) async {
+
+    String? token = await FirebaseMessaging.instance.getToken();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('fcm', token!);
     try {
       final response = await http.post(
         Uri.parse(ApiConstants.childRegisteration),
@@ -14,7 +19,7 @@ class childApiService {
           "Accept": "application/json",
         },
         body: jsonEncode(
-            {'name': name, 'age': age, 'gender': gender.toLowerCase()}),
+            {'name': name, 'age': age, 'gender': gender.toLowerCase() ,'fcm':token}),
       );
 
       if (response.statusCode == 200) {

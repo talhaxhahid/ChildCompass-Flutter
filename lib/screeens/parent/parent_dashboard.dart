@@ -188,61 +188,64 @@ class _parentDashboardState extends ConsumerState<parentDashboard> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children:
-                      List.generate(connectedChilds?.length ?? 0, (index) {
-                        final statusMap = ref.watch(connectedChildsStatusProvider);
-                        final status = connectedChilds?[index];
-                        return GestureDetector(
-                          onTap: () => {_switchChild(connectedChilds![index])},
-                          child: Stack(
-                            clipBehavior: Clip.none,
-                            children: [
-                              Container(
-                                margin: EdgeInsets.only(right: 10),
-                                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: ref.watch(currentChildProvider).toString() == connectedChilds![index]
-                                      ? Colors.blueGrey
-                                      : Color(0xFF4D566A),
-                                  borderRadius: BorderRadius.circular(30),
-                                  boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 4)],
-                                ),
-                                child: Text(
-                                  ref.watch(connectedChildsNameProvider)?[connectedChilds?[index]] ?? "No Connected Childs",
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    color: Colors.white,
-                                    fontFamily: "Quantico",
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                top: 2,
-                                right: 8,
-                                child: Container(
-                                  width: 10,
-                                  height: 10,
+            child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children:
+                        List.generate(connectedChilds?.length ?? 0, (index) {
+                          final statusMap = ref.watch(connectedChildsStatusProvider);
+                          final status = connectedChilds?[index];
+                          return GestureDetector(
+                            onTap: () => {_switchChild(connectedChilds![index])},
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                Container(
+                                  margin: EdgeInsets.only(right: 10),
+                                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
                                   decoration: BoxDecoration(
-                                    //color: Colors.green,
-                                    color: statusMap != null && statusMap[status] == true
-                                        ? Colors.green
-                                        : statusMap != null && statusMap[status] == false
-                                        ? Colors.red
-                                        : Colors.grey,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(color: Colors.white, width: 1), // optional border
+                                    color: ref.watch(currentChildProvider).toString() == connectedChilds![index]
+                                        ? Colors.blueGrey
+                                        : Color(0xFF4D566A),
+                                    borderRadius: BorderRadius.circular(30),
+                                    boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 4)],
+                                  ),
+                                  child: Text(
+                                    ref.watch(connectedChildsNameProvider)?[connectedChilds?[index]] ?? "No Connected Childs",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: Colors.white,
+                                      fontFamily: "Quantico",
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        );
-                      })),
+                                Positioned(
+                                  top: 2,
+                                  right: 8,
+                                  child: Container(
+                                    width: 10,
+                                    height: 10,
+                                    decoration: BoxDecoration(
+                                      //color: Colors.green,
+                                      color: statusMap != null && statusMap[status] == true
+                                          ? Colors.green
+                                          : statusMap != null && statusMap[status] == false
+                                          ? Colors.red
+                                          : Colors.grey,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.white, width: 1), // optional border
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        })),
+              ),
             ),
           ),
           GestureDetector(

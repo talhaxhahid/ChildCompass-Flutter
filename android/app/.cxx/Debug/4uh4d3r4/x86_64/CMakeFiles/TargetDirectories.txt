@@ -1,0 +1,2 @@
+D:/Eman/ChildCompass-Flutter-main/android/app/.cxx/Debug/4uh4d3r4/x86_64/CMakeFiles/edit_cache.dir
+D:/Eman/ChildCompass-Flutter-main/android/app/.cxx/Debug/4uh4d3r4/x86_64/CMakeFiles/rebuild_cache.dir

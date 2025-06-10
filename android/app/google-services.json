@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "669595384141",
+    "project_id": "childcompass-app",
+    "storage_bucket": "childcompass-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:669595384141:android:23459f8f353663b18e1f04",
+        "android_client_info": {
+          "package_name": "com.example.childcompass"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC0tMD58Uw_7zHBBnZbPt_04MrlJQ0UcGA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
