@@ -30,6 +30,7 @@ void main() async {
   await Firebase.initializeApp();
   await FirebaseMessagingService().initialize();
   //MapboxOptions.setAccessToken("pk.eyJ1IjoiZW1hd2F0c29uIiwiYSI6ImNtOGoyNzB5YjBhdDcyaXMzeTBjY2FiZ2sifQ.lhvhhMAAJktVCSXiDyF8Mg");
+  print("In Main Method");
   await Hive.initFlutter();
   await Hive.openBox('tasksBox');
   String intial_route='/onBoardingScreen';
@@ -37,6 +38,7 @@ void main() async {
   var user = prefs.get('user');
   if(user=='child')
     {
+      print("User is Child");
       intial_route='/childDashboard';
     }
   else if(user=='parent') {

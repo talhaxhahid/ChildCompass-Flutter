@@ -1,6 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 
 class FirebaseMessagingService {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
@@ -17,10 +18,33 @@ class FirebaseMessagingService {
     await _requestNotificationPermissions();
     await _initializeNotifications();
     _setupMessageHandlers();
+    setupFirebaseMessaging();
 
     // Get and print token for testing
     final String? token = await _firebaseMessaging.getToken();
     debugPrint('FCM Token: $token');
+  }
+
+  void setupFirebaseMessaging() {
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      if (message.data['type'] == 'sos_alert') {
+        print("SOSSS ALERT HIT");
+
+        FlutterRingtonePlayer().play(
+            fromAsset: "assets/audio/sos.mp3",
+          looping: true, // or false depending on your need
+          volume: 1.0,
+          asAlarm: true
+        );
+      }
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      // Handle when the user taps the notification
+      FlutterRingtonePlayer().stop();
+
+    });
   }
 
   // Set up notification channels (required for Android 8.0+)

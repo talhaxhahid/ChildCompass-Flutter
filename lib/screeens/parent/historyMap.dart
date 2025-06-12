@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:childcompass/services/child/child_api_service.dart';
 import 'package:childcompass/provider/parent_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -34,7 +34,7 @@ class _HistoryMapState extends ConsumerState<HistoryMap> {
   @override
   void initState() {
     super.initState();
-    Future.microtask((){ connectToWebSocket();
+    Future.microtask((){ getLocationHistory();
 
     });
 
@@ -42,26 +42,23 @@ class _HistoryMapState extends ConsumerState<HistoryMap> {
 
 
 
-  void connectToWebSocket() {
+  void getLocationHistory() async {
     if(!isLoading){
     setState(() {
       isLoading=true;
     });}
 
     try {
-      channel!.sink.add(jsonEncode({
-        'type': 'query_history',
-        'targetchildId': ref.watch(currentChildProvider),
+      final data = await childApiService
+          .getLocationHistory(ref.read(currentChildProvider)!);
 
-      }));
-      subscription= channel!.stream.listen(
-            (data) {
+            if(data != null) {
               print("history data received");
-          final decoded = jsonDecode(data);
-          final history = decoded['history'];
-          final child = decoded['childId'];
-          distanceCovered= decoded['distance'];
-          if(ref.watch(currentChildProvider)==child){
+
+          final history = data['locationHistory'];
+
+          distanceCovered= data['distance'];
+
             historyCoordinates=[];
             for(int i=0;i<history.length;i++)
               {
@@ -78,19 +75,10 @@ class _HistoryMapState extends ConsumerState<HistoryMap> {
 
 
             });
-          }
-        },
-        onError: (error) {
-          print("WebSocket error: $error");
 
-        },
-        onDone: () {
-          print("WebSocket connection closed.");
+        }
 
-        },
-        cancelOnError: true,
 
-      );
     } catch (e) {
       print("WebSocket connection failed: $e");
 
@@ -161,11 +149,7 @@ class _HistoryMapState extends ConsumerState<HistoryMap> {
     ref.listen<String?>(currentChildProvider, (previous, next) {
       print("CURRENNT CHILD CHANGE");
       if (next != null) {
-        channel!.sink.add(jsonEncode({
-          'type': 'query_history',
-          'targetchildId': ref.watch(currentChildProvider),
-
-        }));
+        getLocationHistory();
       }
     });
 

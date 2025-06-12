@@ -4,8 +4,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/child/child_background_service.dart';
 import '../../services/child/child_location_service.dart';
 import 'package:childcompass/screeens/child/child_taskscreen.dart';
-
+import '../../services/child/child_api_service.dart';
 import '../../services/parent/parent_api_service.dart';
+
 import '../mutual/messageScreen.dart';
 
 class childDashboard extends StatefulWidget {
@@ -27,6 +28,7 @@ class _childDashboardState extends State<childDashboard> {
   }
 
   void getChildData() async {
+    print("IN CHILDS DASHBOARD");
     SharedPreferences prefs = await SharedPreferences.getInstance();
     childName = prefs.get('childName');
     childCode = prefs.get('connectionString');
@@ -40,6 +42,7 @@ class _childDashboardState extends State<childDashboard> {
 
   @override
   Widget build(BuildContext context) {
+    print("In Child Build");
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -114,7 +117,7 @@ class _childDashboardState extends State<childDashboard> {
                   flex: 7,
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      print("SOS Pressed");
+                      childApiService.sosAlert(connectionString: childCode);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFFF2400), // Scarlet Red

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:geolocator/geolocator.dart';
 import 'package:web_socket_channel/io.dart';
+import 'package:childcompass/services/child/child_api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/api_constants.dart';
 import 'dart:math';
@@ -150,6 +151,13 @@ void startSharingLocation() async {
     if (shouldLogHistory) {
       lastHistoryLocation = position;
       lastHistoryTime = DateTime.now();
+      print('logging Location History');
+      final location = {
+        'longitude': position.longitude,
+        'latitude': position.latitude,
+      };
+       childApiService.logLocationHistory(connectionString: childId!, location: location , distance:distance/1000);
+
     }
 
     if (channel != null) {
@@ -163,8 +171,7 @@ void startSharingLocation() async {
         'longitude': position.longitude,
         'speed': speedKmph,
         'maxSpeed': maxSpeed,
-        'history': shouldLogHistory,
-        'distance':distance/1000,
+
       }));
     }
   });

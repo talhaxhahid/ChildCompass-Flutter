@@ -1,6 +1,6 @@
 class ApiConstants {
   // Home
-  //  static const String baseUrl = "http://10.135.49.203:5002/api";
+  //static const String baseUrl = "http://192.168.100.14:5000/api";
 
   //University
   static const String baseUrl = "https://childcompass-backend-z0nv.onrender.com/api";
@@ -10,8 +10,8 @@ class ApiConstants {
   //***************************Web Sockets********************************
    static const String ActiveStatusSharingSocket ='ws://childcompass-backend-z0nv.onrender.com/activeStatus';
    static const String locationSharingSocket ='ws://childcompass-backend-z0nv.onrender.com/location';
-   // static const String locationSharingSocket ='ws://10.135.49.203:5002/location';
-   // static const String ActiveStatusSharingSocket ='ws://10.135.49.203:5002/activeStatus';
+   // static const String locationSharingSocket ='ws://192.168.100.14:5000/location';
+   // static const String ActiveStatusSharingSocket ='ws://192.168.100.14:5000/activeStatus';
 
 
 
@@ -23,6 +23,9 @@ class ApiConstants {
   static const String addGeofence = "$baseUrl/child/addGeofence";
   static const String getGeofence = "$baseUrl/child/geofenceLocations";
   static const String removeGeofence = "$baseUrl/child/remove-geofence";
+  static const String logLocationHistory = "$baseUrl/child/logLocationHistory";
+  static const String getLocationHistory = "$baseUrl/child/locationHistory";
+  static const String sosAlert ="$baseUrl/child/sosAlert";
 
 
 

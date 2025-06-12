@@ -14,6 +14,7 @@ import '../../services/child/child_api_service.dart';
 import '../../services/parent/parent_api_service.dart';
 import 'appUsage.dart';
 import 'historyMap.dart';
+import '../../services/parent/parent_background_service.dart';
 
 class parentDashboard extends ConsumerStatefulWidget {
   @override
@@ -30,6 +31,7 @@ class _parentDashboardState extends ConsumerState<parentDashboard> {
   @override
   void initState() {
     super.initState();
+    //ParentBackgroundService();
     initDashboard();
   }
 

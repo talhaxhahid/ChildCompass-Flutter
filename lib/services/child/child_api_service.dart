@@ -144,7 +144,33 @@ class childApiService {
       return null;
     }
   }
+  static Future<Map<String, dynamic>?> getLocationHistory(String childId) async {
+    try {
+      final response = await http.get(
+        Uri.parse('${ApiConstants.getLocationHistory}/$childId'),
+        headers: {
+          "Accept": "application/json",
+        },
+      );
 
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        if (responseData['success'] == true) {
+          return {
+            'locationHistory': responseData['data']['locationHistory'] as List,
+            'distance': responseData['data']['distance']
+          };
+        }
+      }
+
+      print("Failed to get geofence locations: ${response.statusCode}");
+      print("Response body: ${response.body}");
+      return null;
+    } catch (e) {
+      print("Error fetching geofence locations: $e");
+      return null;
+    }
+  }
   // Add a new geofence location
   static Future<bool> addGeofence({
     required String connectionString,
@@ -173,6 +199,68 @@ class childApiService {
       return false;
     } catch (e) {
       print("Error adding geofence: $e");
+      return false;
+    }
+  }
+
+  static Future<bool> logLocationHistory({
+    required String connectionString,
+    required Map<String, dynamic> location,
+    required dynamic distance
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse(ApiConstants.logLocationHistory),
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: jsonEncode({
+          'connectionString': connectionString,
+          'location': location,
+          'distance':distance,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        return responseData['success'] == true;
+      }
+
+      print("Failed to add geofence: ${response.statusCode}");
+      print("Response body: ${response.body}");
+      return false;
+    } catch (e) {
+      print("Error adding geofence: $e");
+      return false;
+    }
+  }
+  static Future<bool> sosAlert({
+    required String connectionString
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse(ApiConstants.sosAlert),
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: jsonEncode({
+          'connectionString': connectionString,
+
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        return responseData['success'] == true;
+      }
+
+      print("Failed to send SOS ALERT: ${response.statusCode}");
+      print("Response body: ${response.body}");
+      return false;
+    } catch (e) {
+      print("Error SENDING SOS: $e");
       return false;
     }
   }
