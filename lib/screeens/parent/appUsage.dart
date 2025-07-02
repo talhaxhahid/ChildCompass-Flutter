@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../services/child/child_api_service.dart';
+import '../mutual/placeholder.dart';
 
 class AppUsageList extends ConsumerStatefulWidget {
   @override
@@ -54,7 +55,7 @@ class _AppUsageListState extends ConsumerState<AppUsageList> {
         SizedBox(
           height: 15,
         ),
-        Container(
+        isLoading? buildShimmerAppUsagePlaceholder() :Container(
           height: 300,
           decoration: BoxDecoration(
             color: Colors.white,
@@ -68,7 +69,7 @@ class _AppUsageListState extends ConsumerState<AppUsageList> {
               ),
             ],
           ),
-          child: isLoading? Center(child: CircularProgressIndicator()) :ListView.separated(
+          child: ListView.separated(
             separatorBuilder: (context, index) =>  Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Container(color: Colors.black45, height: 0.3),

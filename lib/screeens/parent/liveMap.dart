@@ -10,6 +10,7 @@ import 'package:widget_to_marker/widget_to_marker.dart';
 import 'dart:convert';
 import '../../core/api_constants.dart';
 import '../../services/child/child_api_service.dart';
+import '../mutual/placeholder.dart';
 import 'avatarPin.dart';
 
 class LiveMap extends ConsumerStatefulWidget {
@@ -268,7 +269,7 @@ class _LiveMapState extends ConsumerState<LiveMap> {
       }
     });
 
-    return Container(
+    return isLoading?buildShimmerMapPlaceholder(): Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         border: Border.all(width: 1, color: const Color(0xFF373E4E)),
@@ -276,7 +277,7 @@ class _LiveMapState extends ConsumerState<LiveMap> {
       height: 300,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10),
-        child:isLoading?Center(child: CircularProgressIndicator()): GoogleMap(
+        child: GoogleMap(
           mapType: MapType.normal,
           style: mapStyle,
           initialCameraPosition: CameraPosition(

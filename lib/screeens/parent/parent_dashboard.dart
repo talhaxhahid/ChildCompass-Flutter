@@ -9,11 +9,13 @@ import 'package:childcompass/provider/parent_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../core/api_constants.dart';
 import '../../services/child/child_api_service.dart';
 import '../../services/parent/parent_api_service.dart';
 import 'appUsage.dart';
 import 'historyMap.dart';
+import '../../screeens/mutual/placeholder.dart';
 import '../../services/parent/parent_background_service.dart';
 
 class parentDashboard extends ConsumerStatefulWidget {
@@ -97,6 +99,8 @@ class _parentDashboardState extends ConsumerState<parentDashboard> {
     connectToWebSocket();
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -107,7 +111,7 @@ class _parentDashboardState extends ConsumerState<parentDashboard> {
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Hi, $parentName',
+              Text(!isLoading?'Hi, $parentName':'Welcome',
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w400,
@@ -128,7 +132,7 @@ class _parentDashboardState extends ConsumerState<parentDashboard> {
                       child: Icon(Icons.refresh, color: Colors.white)),
                   InkWell(
                       onTap: () {
-                        // Navigator.pushNamed(context, '/childSettings');
+                         Navigator.pushNamed(context, '/ParentSettingScreen');
                       },
                       child: Icon(Icons.settings_rounded, color: Colors.white)),
                 ],
@@ -141,23 +145,32 @@ class _parentDashboardState extends ConsumerState<parentDashboard> {
             padding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
             child: Column(
               children: [
-                connectedChildsWidget(),
+
+                !isLoading?connectedChildsWidget():buildConnectedChildsPlaceholder(),
                 SizedBox(
                   height: 30,
                 ),
                 !isLoading
                     ? LiveMap()
-                    : SizedBox(height: 300, child: Center(child: CircularProgressIndicator(),),),
+                    : buildShimmerMapPlaceholder(),
                 SizedBox(
                   height: 30,
                 ),
 
-                ParentDashboardButton(),
+                !isLoading?ParentDashboardButton():DashboardButtonsShimmerEffect(context),
                 SizedBox(
                   height: 30,
                 ),
                 !isLoading?AppUsageList()
-                    : SizedBox(height: 300, child: Center(child: CircularProgressIndicator(),),),
+                    : Column(
+                      children: [
+                        Text("App Useage (24 Hours)" ,style: TextStyle(color: Color(0xFF373E4E) ,fontWeight: FontWeight.w900 ,fontFamily: 'Quantico' ,fontSize: 18),),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        buildShimmerAppUsagePlaceholder(),
+                      ],
+                    ),
 
                 SizedBox(
                   height: 30,
@@ -167,7 +180,7 @@ class _parentDashboardState extends ConsumerState<parentDashboard> {
                   height: 15,
                 ),
                 !isLoading?HistoryMap()
-                : SizedBox(height: 300, child: Center(child: CircularProgressIndicator(),),),
+                : buildShimmerHistoryMapPlaceholder(),
               ],
             ),
           ),

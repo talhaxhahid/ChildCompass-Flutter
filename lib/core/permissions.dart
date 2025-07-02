@@ -7,7 +7,7 @@ class permissions {
      final location_permission = await requestLocationPermissions() ;
      final useage_permission = await requestUseagePermissions() ;
 
-     return (location_permission && useage_permission);
+     return location_permission && useage_permission;
  }
 
  static Future<bool> requestLocationPermissions() async {

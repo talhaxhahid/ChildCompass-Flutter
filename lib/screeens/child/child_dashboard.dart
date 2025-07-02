@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import '../../core/permissions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/child/child_background_service.dart';
@@ -37,7 +38,30 @@ class _childDashboardState extends State<childDashboard> {
   }
 
   Future<void> _requestPermissions() async {
-    await permissions.requestLocationPermissions();
+    try {
+      // Request permissions
+      final granted = await permissions.grantRequiredPermissions();
+
+      if (!granted) {
+        print('Required permissions not granted');
+        return;
+      }
+
+      // Check service status
+      final service = FlutterBackgroundService();
+      final isRunning = await service.isRunning();
+
+      if (!isRunning) {
+        print('Starting background service...');
+         ChildBackgroundService();
+        print('Background service started successfully');
+      } else {
+        print('Background service is already running');
+      }
+    } catch (e) {
+      print('Error in _requestPermissions: $e');
+      // You might want to show an error message to the user here
+    }
   }
 
   @override
@@ -90,7 +114,11 @@ class _childDashboardState extends State<childDashboard> {
                 ),
                 InkWell(
                   onTap: () {
-                    // Navigator.pushNamed(context, '/childSettings');
+                    Navigator.pushNamed(
+                      context,
+                      '/childSettingsPermission',
+
+                    );
                   },
                   child: const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 8.0),

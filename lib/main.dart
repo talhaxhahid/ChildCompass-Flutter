@@ -1,5 +1,6 @@
 import 'package:childcompass/core/api_constants.dart';
 import 'package:childcompass/provider/parent_provider.dart';
+import 'package:childcompass/screeens/child/child_setting.dart';
 import 'package:childcompass/screeens/child/child_code.dart';
 import 'package:childcompass/screeens/child/child_dashboard.dart';
 import 'package:childcompass/screeens/child/child_registeration.dart';
@@ -14,6 +15,7 @@ import 'package:childcompass/screeens/parent/parentEndChildSettings.dart';
 import 'package:childcompass/screeens/parent/parent_dashboard.dart';
 import 'package:childcompass/screeens/parent/parent_login.dart';
 import 'package:childcompass/screeens/parent/parent_registeration.dart';
+import 'package:childcompass/screeens/parent/parent_settings.dart';
 import 'package:childcompass/screeens/parent/parentsList.dart';
 import 'package:childcompass/screeens/parent/parent_taskscreen.dart';
 import 'package:childcompass/services/firebaseMessaging.dart';
@@ -117,6 +119,9 @@ class MyApp extends StatelessWidget  {
         '/GeofenceListScreen':(context)=>GeofenceListScreen(),
         '/childTaskscreen': (context) => ChildTaskscreen(),
         '/parentTaskScreen': (context) => ParentTaskScreen(),
+        '/childSettingsPermission': (context)=> ChildSettingsPermission(),
+        '/ParentSettingScreen':(context)=>ParentSettingsScreen()
+
 
 
       },

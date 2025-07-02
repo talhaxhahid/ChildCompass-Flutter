@@ -11,6 +11,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:widget_to_marker/widget_to_marker.dart';
 import 'dart:convert';
 import '../../core/api_constants.dart';
+import '../mutual/placeholder.dart';
 import 'avatarPin.dart';
 
 class HistoryMap extends ConsumerStatefulWidget {
@@ -96,53 +97,131 @@ class _HistoryMapState extends ConsumerState<HistoryMap> {
       )
     };
   }
-
   void _updateMarker() async {
-    String ImageUrl = ref.read(connectedChildsImageProvider)?[ref.read(currentChildProvider)]??" ";
+    String ImageUrl = ref.read(connectedChildsImageProvider)?[ref.read(currentChildProvider)] ?? " ";
 
     _markers.clear();
-    for(int i=0 ; i<historyCoordinates.length-1;i++)
-      {
+
+    // Ensure we have at least 2 points (first and last)
+    if (historyCoordinates.isEmpty) return;
+
+    final int totalPoints = historyCoordinates.length;
+    final int maxMarkers = 50;
+    final int pointsToSelect = totalPoints > maxMarkers ? maxMarkers : totalPoints;
+
+    // Calculate step size if we need to skip points
+    double step = 1.0;
+    if (totalPoints > maxMarkers) {
+      step = (totalPoints - 1) / (pointsToSelect - 1);
+    }
+
+    // Always include first point
+    _markers.add(
+      Marker(
+        markerId: const MarkerId("FirstHistoryLocation"),
+        position: historyCoordinates.first,
+        icon: await CircleAvatar(backgroundColor: Colors.redAccent, radius: 22).toBitmapDescriptor(
+            logicalSize: const Size(160, 160),
+            imageSize: const Size(160, 160)
+        ),
+        infoWindow: InfoWindow(
+          title: 'Location Time',
+          snippet: historyTimeStamp.first,
+          onTap: () {},
+        ),
+      ),
+    );
+
+    // Add intermediate points if needed
+    if (pointsToSelect > 2) {
+      for (int i = 1; i < pointsToSelect - 1; i++) {
+        int index = (i * step).round();
+        // Ensure we don't go out of bounds and don't duplicate first/last points
+        index = index.clamp(1, totalPoints - 2);
+
         _markers.add(
           Marker(
-            markerId: MarkerId("Locationhistory$i"),
-            position: historyCoordinates[i],
-            icon: i==0?await CircleAvatar(backgroundColor: Colors.redAccent,radius: 22,).toBitmapDescriptor(
-                logicalSize: const Size(160, 160), imageSize: const Size(160, 160)
-            ):await CircleAvatar(backgroundColor: Colors.indigo.shade300,radius: 12,).toBitmapDescriptor(
-                logicalSize: const Size(160, 160), imageSize: const Size(160, 160)
+            markerId: MarkerId("LocationHistory_$i"),
+            position: historyCoordinates[index],
+            icon: await CircleAvatar(backgroundColor: Colors.indigo.shade300, radius: 12).toBitmapDescriptor(
+                logicalSize: const Size(160, 160),
+                imageSize: const Size(160, 160)
             ),
             infoWindow: InfoWindow(
               title: 'Location Time',
-              snippet: historyTimeStamp[i],
+              snippet: historyTimeStamp[index],
               onTap: () {},
-
             ),
-
-
           ),
         );
       }
+    }
+
+    // Always include last point
     _markers.add(
       Marker(
         markerId: const MarkerId('LastHistoryLocation'),
         position: historyCoordinates.last,
-        icon: await PinWithAvatar(imageUrl:ImageUrl).toBitmapDescriptor(
-            logicalSize: const Size(160, 160), imageSize: const Size(160, 160)
+        icon: await PinWithAvatar(imageUrl: ImageUrl).toBitmapDescriptor(
+            logicalSize: const Size(160, 160),
+            imageSize: const Size(160, 160)
         ),
         infoWindow: InfoWindow(
-
           title: 'Location Time',
           snippet: historyTimeStamp.last,
-          // Use a custom widget for the info window
         ),
-
-        // BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
       ),
     );
-    setState(()  {
-    });
+
+    setState(() {});
   }
+
+  // void _updateMarker() async {
+  //   String ImageUrl = ref.read(connectedChildsImageProvider)?[ref.read(currentChildProvider)]??" ";
+  //
+  //   _markers.clear();
+  //   for(int i=0 ; i<historyCoordinates.length-1;i++)
+  //     {
+  //       _markers.add(
+  //         Marker(
+  //           markerId: MarkerId("Locationhistory$i"),
+  //           position: historyCoordinates[i],
+  //           icon: i==0?await CircleAvatar(backgroundColor: Colors.redAccent,radius: 22,).toBitmapDescriptor(
+  //               logicalSize: const Size(160, 160), imageSize: const Size(160, 160)
+  //           ):await CircleAvatar(backgroundColor: Colors.indigo.shade300,radius: 12,).toBitmapDescriptor(
+  //               logicalSize: const Size(160, 160), imageSize: const Size(160, 160)
+  //           ),
+  //           infoWindow: InfoWindow(
+  //             title: 'Location Time',
+  //             snippet: historyTimeStamp[i],
+  //             onTap: () {},
+  //
+  //           ),
+  //
+  //
+  //         ),
+  //       );
+  //     }
+  //   _markers.add(
+  //     Marker(
+  //       markerId: const MarkerId('LastHistoryLocation'),
+  //       position: historyCoordinates.last,
+  //       icon: await PinWithAvatar(imageUrl:ImageUrl).toBitmapDescriptor(
+  //           logicalSize: const Size(160, 160), imageSize: const Size(160, 160)
+  //       ),
+  //       infoWindow: InfoWindow(
+  //
+  //         title: 'Location Time',
+  //         snippet: historyTimeStamp.last,
+  //         // Use a custom widget for the info window
+  //       ),
+  //
+  //       // BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+  //     ),
+  //   );
+  //   setState(()  {
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -153,7 +232,7 @@ class _HistoryMapState extends ConsumerState<HistoryMap> {
       }
     });
 
-    return Column(
+    return isLoading?buildShimmerHistoryMapPlaceholder():Column(
       spacing: 10,
       children: [
         Container(
@@ -184,7 +263,7 @@ class _HistoryMapState extends ConsumerState<HistoryMap> {
           height: 300,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
-            child:isLoading?Center(child: CircularProgressIndicator()): GoogleMap(
+            child: GoogleMap(
               initialCameraPosition: CameraPosition(
                 target: historyCoordinates.last,
                 zoom: _currentZoom,
