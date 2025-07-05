@@ -37,6 +37,7 @@ dependencies:
   flutter_local_notifications: ^19.1.0
   flutter_ringtone_player: ^4.0.0+4
   shimmer: ^3.0.0
+  screen_state: ^4.1.1
 
 
 dev_dependencies:

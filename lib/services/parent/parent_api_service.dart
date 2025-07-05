@@ -65,6 +65,27 @@ class parentApiService {
     }
   }
 
+  Future<Map<String, dynamic>> updateNotificationSettings(dynamic settings) async {
+
+    final url = Uri.parse(ApiConstants.parentNotificationSettings);
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(settings),
+      );
+
+      if (response.statusCode == 200) {
+        return {"success": true};
+      } else {
+        return {"success": false};
+      }
+
+    } catch (e) {
+      return {"message": "An error occurred: $e"};
+    }
+  }
+
   //LOGIN API
   Future<Map<String, dynamic>> loginParent(String email, String password) async {
     String? token = await FirebaseMessaging.instance.getToken();

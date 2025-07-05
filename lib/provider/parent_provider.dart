@@ -21,6 +21,13 @@ final batteryProvider = StateProvider<String?>((ref) => "0");
 
 final maxSpeedProvider = StateProvider<String?>((ref) => "0");
 
+final geofenceNotificationProvider = StateProvider<bool>((ref) => true);
+final chatNotificationProvider = StateProvider<bool>((ref) => true);
+final speedNotificationProvider = StateProvider<bool>((ref) => true);
+final batteryNotificationProvider = StateProvider<bool>((ref) => true);
+
+
+
 
 
 

@@ -38,6 +38,7 @@ class ApiConstants {
   static const String parentDetails= "$baseUrl/parent/parent-details";
   static const String removeChild= "$baseUrl/parent/remove-child";
   static const String parentsList = "$baseUrl/parent/parents-by-connection/";
+  static const String parentNotificationSettings = "$baseUrl/parent/update-notification-settings";
 
    // *********************Task EndPoints***********************************
 

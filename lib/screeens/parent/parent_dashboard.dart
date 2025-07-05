@@ -16,6 +16,7 @@ import '../../services/parent/parent_api_service.dart';
 import 'appUsage.dart';
 import 'historyMap.dart';
 import '../../screeens/mutual/placeholder.dart';
+import 'package:screen_state/screen_state.dart';
 import '../../services/parent/parent_background_service.dart';
 
 class parentDashboard extends ConsumerStatefulWidget {
@@ -30,16 +31,39 @@ class _parentDashboardState extends ConsumerState<parentDashboard> {
   bool isLoading = true;
   WebSocketChannel? channel = IOWebSocketChannel.connect(ApiConstants.ActiveStatusSharingSocket);
 
+  final Screen _screen = Screen();
+  StreamSubscription<ScreenStateEvent>? _subscription;
+  void startListening() {
+    try {
+      _subscription = _screen.screenStateStream.listen(onData);
+
+    } catch (exception) {
+      print(exception);
+    }
+  }
+  void onData(ScreenStateEvent event) {
+    if (event == ScreenStateEvent.SCREEN_ON) {
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/parentDashboard',
+            (Route<dynamic> route) => false,
+      );
+    }
+  }
+
+
   @override
   void initState() {
     super.initState();
     //ParentBackgroundService();
     initDashboard();
+    startListening();
   }
 
   StreamSubscription? _webSocketSubscription;
 
   void connectToWebSocket() {
+
     // Send registration message
     channel!.sink.add(jsonEncode({
       'type': 'register_parent',
@@ -81,6 +105,10 @@ class _parentDashboardState extends ConsumerState<parentDashboard> {
     ref.read(parentEmailProvider.notifier).state = parentEmail;
     ref.read(connectedChildsProvider.notifier).state = connectedChilds;
     ref.read(currentChildProvider.notifier).state = connectedChilds![0];
+    ref.read(geofenceNotificationProvider.notifier).state=response['body']['parent']['geofenceNotification'];
+    ref.read(chatNotificationProvider.notifier).state=response['body']['parent']['chatNotification'];
+    ref.read(speedNotificationProvider.notifier).state=response['body']['parent']['speedNotification'];
+    ref.read(batteryNotificationProvider.notifier).state=response['body']['parent']['batteryNotification'];
     final Map<String, String?> childImagesMap = {};
 
     for (int i = 0; i < connectedChilds!.length; i++) {

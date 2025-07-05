@@ -25,6 +25,7 @@ class ChildActiveStatusService {
   }
 
   void _connect() {
+
     try {
       _channel = WebSocketChannel.connect(Uri.parse(wsUrl));
       _isConnected = true;
@@ -94,6 +95,7 @@ class ChildActiveStatusService {
   }
 
   void dispose() {
+
     _pingTimer?.cancel();
     _reconnectTimer?.cancel();
     _channel?.sink.close();
