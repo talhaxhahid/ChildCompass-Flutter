@@ -65,6 +65,77 @@ class parentApiService {
     }
   }
 
+  Future<dynamic> forgotPassword(String email) async {
+    try {
+      final response = await http.post(
+        Uri.parse(ApiConstants.forgotPassword),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "email": email.trim()
+        }),
+      );
+
+
+      if (response.statusCode == 200) {
+        return {"success":true};
+      } else {
+        return {"success":false};
+      }
+    } catch (e) {
+      print("Network Error: $e");
+      return {"success":false,"error": "Network error, please try again later."};
+    }
+  }
+  Future<dynamic> resetPassword(String email, String verificationCode,String newPassword) async {
+    try {
+      final response = await http.post(
+        Uri.parse(ApiConstants.resetPassword),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "email": email.trim(),
+          "verificationCode":verificationCode.trim(),
+          "newPassword":newPassword.trim()
+        }),
+      );
+
+
+
+      if (response.statusCode == 200) {
+        return {"success":true};
+      } else {
+        return {"success":false};
+      }
+    } catch (e) {
+      print("Network Error: $e");
+      return {"success":false,"error": "Network error, please try again later."};
+    }
+  }
+
+  Future<dynamic> changePassword(String email, String currentPassword,String newPassword) async {
+    try {
+      final response = await http.post(
+        Uri.parse(ApiConstants.changePassword),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "email":email.trim(),
+          "currentPassword": currentPassword.trim(),
+          "newPassword":newPassword.trim()
+        }),
+      );
+
+
+
+      if (response.statusCode == 200) {
+        return {"success":true};
+      } else {
+        return {"success":false};
+      }
+    } catch (e) {
+      print("Network Error: $e");
+      return {"success":false,"error": "Network error, please try again later."};
+    }
+  }
+
   Future<Map<String, dynamic>> updateNotificationSettings(dynamic settings) async {
 
     final url = Uri.parse(ApiConstants.parentNotificationSettings);
@@ -190,6 +261,39 @@ class parentApiService {
     } catch (e) {
       print('Exception: $e');
       return [];
+    }
+  }
+
+  Future<Map<String, dynamic>> changeEmail(String token, String password, String newEmail) async {
+    try {
+      final response = await http.post(
+        Uri.parse(ApiConstants.changeEmail),
+        headers: {"Content-Type": "application/json",'Authorization': 'Bearer $token'},
+        body: jsonEncode({
+          'password': password,
+          'newEmail': newEmail,
+        }),
+      );
+
+      return jsonDecode(response.body);
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> verifyEmailChange(String email, String token) async {
+    try {
+      final response = await http.post(
+        Uri.parse(ApiConstants.verifyEmailChange),
+        headers: {"Content-Type": "application/json",'Authorization': 'Bearer $token'},
+        body: jsonEncode({
+          'email': email,
+        }),
+      );
+
+      return jsonDecode(response.body);
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
     }
   }
 

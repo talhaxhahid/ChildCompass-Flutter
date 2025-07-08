@@ -6,14 +6,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../provider/parent_provider.dart';
 import '../../services/parent/parent_api_service.dart';
 
-class parentLogin extends ConsumerStatefulWidget  {
+class forgotPassword extends ConsumerStatefulWidget  {
   @override
-  _ParentLoginState createState() => _ParentLoginState();
+  _ForgotPasswordState createState() => _ForgotPasswordState();
 }
 
-class _ParentLoginState extends ConsumerState<parentLogin> {
+class _ForgotPasswordState extends ConsumerState<forgotPassword> {
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+
 
   @override
   Widget build(BuildContext context) {
@@ -53,31 +53,7 @@ class _ParentLoginState extends ConsumerState<parentLogin> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
 
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Transform.scale(
-                      scale: 1.1,
-                      child: Lottie.asset(
-                        "assets/animations/parent.json",
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Container(
-                      height: 170,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage("assets/images/messageBox/welcomeback.png"),
-                          fit: BoxFit.contain,
-                          alignment: Alignment.center,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+
               ),
               SizedBox(height: 20),
               ClipRRect(
@@ -95,7 +71,7 @@ class _ParentLoginState extends ConsumerState<parentLogin> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text("LOGIN", style: TextStyle(color: Colors.black , fontWeight: FontWeight.bold,fontFamily: "Quantico" , fontSize: 18),),
+                        Text("RECOVER PASSWORD", style: TextStyle(color: Colors.black , fontWeight: FontWeight.bold,fontFamily: "Quantico" , fontSize: 18),),
 
                         SizedBox(height: 10),
                         TextField(
@@ -111,34 +87,13 @@ class _ParentLoginState extends ConsumerState<parentLogin> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 10),
-                        TextField(
-                          controller: _passwordController,
-                          keyboardType: TextInputType.visiblePassword,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.white.withOpacity(0.8),
-                            hintText: "Password",
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            InkWell(onTap: ()=>{Navigator.pushNamed(context, '/ForgotPasswordScreen')}, child: Text("Forgot Password ?", style: TextStyle(color: Colors.black , fontWeight: FontWeight.bold,fontFamily: "Quantico" , fontSize: 12 ),)),
-                          ],
-                        ),
-                        SizedBox(height: 10),
+
+                        SizedBox(height: 30),
                         ElevatedButton(
                           onPressed: () {
-                            handleLoginResponse(
+                            handleResponse(
                                 context,
-                                _emailController.text,  // Pass email
-                                _passwordController.text // Pass password
+                                _emailController.text
                             );
                           },
 
@@ -158,13 +113,7 @@ class _ParentLoginState extends ConsumerState<parentLogin> {
                           ),
                         ),
                         SizedBox(height: 10,),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text("Don't have an account ? ", style: TextStyle(color: Colors.black , fontWeight: FontWeight.bold,fontFamily: "Quantico" , fontSize: 12),),
-                            InkWell(onTap: ()=>{Navigator.pushNamed(context, '/parentRegisteration')}, child: Text("Register", style: TextStyle(color: Colors.orange , fontWeight: FontWeight.bold,fontFamily: "Quantico" , fontSize: 12 ),)),
-                          ],
-                        ),
+
 
                       ],
                     ),
@@ -177,27 +126,17 @@ class _ParentLoginState extends ConsumerState<parentLogin> {
       ),
     );
   }
-  void handleLoginResponse(BuildContext context, String email, String password) async {
+  void handleResponse(BuildContext context, String email) async {
     final parentApiService _apiService = parentApiService();
-    final response = await _apiService.loginParent(email, password);
+    final response = await _apiService.forgotPassword(email);
 
-    if (response.containsKey("token")) {
-      // Login successful, store token and navigate
-      final String token = response["token"];
-      print("Login successful! Token: $token");
-      // Navigate to dashboard or home screen
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('user', 'parent');
-      await prefs.setString('authToken', token);
-      ref.read(parentEmailProvider.notifier).state = response['parent']['email'];
-      if(response['message']=='verifyEmail')
-        Navigator.pushReplacementNamed(context, "/emailVerification");
-      else
-      Navigator.pushReplacementNamed(context, "/parentDashboard");
+    if (response['success']==true) {
+      ref.read(parentEmailProvider.notifier).state=email;
+      Navigator.pushNamed(context, '/ResetPassword');
     } else {
       // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(response["message"] ?? "Login failed")),
+        SnackBar(content: Text("No Account Found For Given Email")),
       );
     }
   }

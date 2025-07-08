@@ -91,6 +91,10 @@ class _ParentSettingsScreenState extends ConsumerState<ParentSettingsScreen> {
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
                 // Handle change password
+                Navigator.pushNamed(
+                    context,
+                    '/ChangePassword'
+                );
               },
             ),
             const Divider(height: 1),
@@ -100,6 +104,10 @@ class _ParentSettingsScreenState extends ConsumerState<ParentSettingsScreen> {
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
                 // Handle change email
+                Navigator.pushNamed(
+                    context,
+                    '/ChangeEmail'
+                );
               },
             ),
           ],

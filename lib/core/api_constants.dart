@@ -39,6 +39,11 @@ class ApiConstants {
   static const String removeChild= "$baseUrl/parent/remove-child";
   static const String parentsList = "$baseUrl/parent/parents-by-connection/";
   static const String parentNotificationSettings = "$baseUrl/parent/update-notification-settings";
+  static const String forgotPassword = "$baseUrl/parent/forgot-password";
+  static const String resetPassword = "$baseUrl/parent/reset-password";
+  static const String changePassword = "$baseUrl/parent/change-password";
+  static const String changeEmail = "$baseUrl/parent/change-email";
+  static const String verifyEmailChange = "$baseUrl/parent//verify-email-change";
 
    // *********************Task EndPoints***********************************
 

@@ -7,8 +7,11 @@ import 'package:childcompass/screeens/child/child_registeration.dart';
 import 'package:childcompass/screeens/child/child_taskscreen.dart';
 import 'package:childcompass/screeens/mutual/onBoardingScreen.dart';
 import 'package:childcompass/screeens/parent/ParentEndChildDetails.dart';
+import 'package:childcompass/screeens/parent/changeEmailScreen.dart';
+import 'package:childcompass/screeens/parent/changePassword.dart';
 import 'package:childcompass/screeens/parent/child_connection.dart';
 import 'package:childcompass/screeens/parent/email_verification.dart';
+import 'package:childcompass/screeens/parent/forgotPassword.dart';
 import 'package:childcompass/screeens/parent/geoFenceSetup.dart';
 import 'package:childcompass/screeens/parent/geofenceLocations.dart';
 import 'package:childcompass/screeens/parent/parentEndChildSettings.dart';
@@ -18,6 +21,7 @@ import 'package:childcompass/screeens/parent/parent_registeration.dart';
 import 'package:childcompass/screeens/parent/parent_settings.dart';
 import 'package:childcompass/screeens/parent/parentsList.dart';
 import 'package:childcompass/screeens/parent/parent_taskscreen.dart';
+import 'package:childcompass/screeens/parent/resetPassword.dart';
 import 'package:childcompass/services/firebaseMessaging.dart';
 import 'package:childcompass/services/parent/parent_api_service.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -120,7 +124,12 @@ class MyApp extends StatelessWidget  {
         '/childTaskscreen': (context) => ChildTaskscreen(),
         '/parentTaskScreen': (context) => ParentTaskScreen(),
         '/childSettingsPermission': (context)=> ChildSettingsPermission(),
-        '/ParentSettingScreen':(context)=>ParentSettingsScreen()
+        '/ParentSettingScreen':(context)=>ParentSettingsScreen(),
+        '/ForgotPasswordScreen':(context)=>forgotPassword(),
+        '/ResetPassword':(context)=>ResetPassword(),
+        '/ChangePassword':(context)=>ChangePasswordScreen(),
+        '/ChangeEmail':(context)=>ChangeEmailScreen(),
+
 
 
 
