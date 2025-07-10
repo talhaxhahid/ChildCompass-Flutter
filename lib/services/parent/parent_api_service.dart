@@ -274,24 +274,52 @@ class parentApiService {
           'newEmail': newEmail,
         }),
       );
-
-      return jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return {"success": true};
+      } else {
+        return {"success": false};
+      }
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
   }
-
-  Future<Map<String, dynamic>> verifyEmailChange(String email, String token) async {
+  Future<Map<String, dynamic>> setSpeedLimit(String connectionString, int speedLimit) async {
+    try {
+      print(connectionString);
+      print(speedLimit);
+      final response = await http.post(
+        Uri.parse(ApiConstants.setSpeedLimit),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          'connectionString': connectionString,
+          'speedLimit': speedLimit,
+        }),
+      );
+      print(response.statusCode);
+      print(response.body);
+      if (response.statusCode == 200) {
+        return {"success": true};
+      } else {
+        return {"success": false};
+      }
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+  Future<Map<String, dynamic>> verifyEmailChange(String verificationCode, String token) async {
     try {
       final response = await http.post(
         Uri.parse(ApiConstants.verifyEmailChange),
         headers: {"Content-Type": "application/json",'Authorization': 'Bearer $token'},
         body: jsonEncode({
-          'email': email,
+          'verificationCode': verificationCode,
         }),
       );
-
-      return jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return {"success": true};
+      } else {
+        return {"success": false};
+      }
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }

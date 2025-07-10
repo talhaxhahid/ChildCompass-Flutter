@@ -26,6 +26,8 @@ class ApiConstants {
   static const String logLocationHistory = "$baseUrl/child/logLocationHistory";
   static const String getLocationHistory = "$baseUrl/child/locationHistory";
   static const String sosAlert ="$baseUrl/child/sosAlert";
+  static const String setSpeedLimit ="$baseUrl/child/setSpeedLimit";
+  static const String deleteAccount ="$baseUrl/child/deleteAccount";
 
 
 

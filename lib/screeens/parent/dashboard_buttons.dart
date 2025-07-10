@@ -1,7 +1,12 @@
+import 'dart:convert';
+
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/api_constants.dart';
 import '../../provider/parent_provider.dart';
 import '../mutual/messageScreen.dart';
+import 'package:http/http.dart' as http;
 class ParentDashboardButton extends ConsumerStatefulWidget {
   const ParentDashboardButton({super.key});
 
@@ -10,66 +15,146 @@ class ParentDashboardButton extends ConsumerStatefulWidget {
 }
 
 class _ParentDashboardButtonState extends ConsumerState<ParentDashboardButton> {
+
+  int UnreadCount=0;
+
+  Future<void> GetUnreadCount() async {
+    final response = await http.get(
+      Uri.parse('${ApiConstants.messaging}unread-count/${ref.read(parentEmailProvider)}/${ref.read(currentChildProvider)}_${ref.read(parentEmailProvider)}'),
+    );
+    print(response.body);
+    final data = json.decode(response.body);
+    UnreadCount=data['count'];
+
+    setState(() {
+
+    });
+
+  }
+  @override
+  void initState() {
+    super.initState();
+
+    _setupFCM();
+  }
+  Future<void> _setupFCM() async {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      if (message.data['chatId'] == '${ref.read(currentChildProvider)}_${ref.read(parentEmailProvider)}') {
+        UnreadCount++;
+        setState(() {
+
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    ref.listen<String?>(currentChildProvider, (previous, next) {
+      setState(() {
+        UnreadCount=0;
+        GetUnreadCount();
+      });
+
+
+    });
     return Center(
       child: Wrap(
         spacing: 12,
         runSpacing: 12,
         children: [
           // Speed Widget
-          Container(
-            width: 240,
-            height: 60,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF44336),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children:  [
-                    Icon(Icons.speed, color: Colors.white, size: 28),
-                    SizedBox(width: 10),
-                    Text(ref.watch(speedProvider).toString()+" km/hr", style: TextStyle(color: Colors.white, fontSize: 16,fontFamily: "Quantico",)),
-                  ],
-                ),
-                Container(width: 1, height: 40, color: Colors.white),
-                Text("Max\n"+ref.watch(maxSpeedProvider).toString()+" km/hr", style: TextStyle(color: Colors.white, fontSize: 14,fontFamily: "Quantico",)),
-              ],
+          InkWell(
+            onTap: (){
+
+              Navigator.pushNamed(context, '/SetSpeedLimit');
+            },
+            child: Container(
+              width: 240,
+              height: 60,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF44336),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children:  [
+                      Icon(Icons.speed, color: Colors.white, size: 28),
+                      SizedBox(width: 10),
+                      Text(ref.watch(speedProvider).toString()+" km/hr", style: TextStyle(color: Colors.white, fontSize: 16,fontFamily: "Quantico",)),
+                    ],
+                  ),
+                  Container(width: 1, height: 40, color: Colors.white),
+                  Text("Max\n"+ref.watch(maxSpeedProvider).toString()+" km/hr", style: TextStyle(color: Colors.white, fontSize: 14,fontFamily: "Quantico",)),
+                ],
+              ),
             ),
           ),
 
           // Chat Button
-          GestureDetector(
-            onTap: (){
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ChatScreen(
-                    currentUserName: ref.read(parentNameProvider)!,
-                    currentUserId: ref.read(parentEmailProvider)!,
-                    otherUserId: ref.read(currentChildProvider)!,
-                    otherUserName: ref.read(connectedChildsNameProvider)![ref.read(currentChildProvider)],
+          Stack(
+            children: [
+              GestureDetector(
+                onTap: () {
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ChatScreen(
+                        currentUserName: ref.read(parentNameProvider)!,
+                        currentUserId: ref.read(parentEmailProvider)!,
+                        otherUserId: ref.read(currentChildProvider)!,
+                        otherUserName: ref.read(connectedChildsNameProvider)![ref.read(currentChildProvider)],
+                      ),
+                    ),
+                  );
+                  UnreadCount=0;
+                  setState(() {
+
+                  });
+                },
+                child: Container(
+                  width: 100,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2D2D2D),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Center(
+                    child: Icon(Icons.chat_bubble_outline, color: Colors.white, size: 28),
                   ),
                 ),
-              );
-            },
-            child: Container(
-              width: 100,
-              height: 60,
-              decoration: BoxDecoration(
-                color: const Color(0xFF2D2D2D),
-                borderRadius: BorderRadius.circular(16),
               ),
-              child: const Center(
-                child: Icon(Icons.chat_bubble_outline, color: Colors.white, size: 28),
-              ),
-            ),
+              // Unread count badge
+               UnreadCount>0?Positioned(
+                right: 3,
+                top: 3,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: const BoxDecoration(
+                    color: Colors.red, // Badge color
+                    shape: BoxShape.circle,
+                  ),
+                  constraints: const BoxConstraints(
+                    minWidth: 20,
+                    minHeight: 20,
+                  ),
+                  child: Text(
+                    UnreadCount.toString(), // Replace with your actual unread count
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ):Container(width: 1,height: 1,),
+            ],
           ),
 
           // Battery Button

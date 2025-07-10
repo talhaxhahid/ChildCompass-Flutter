@@ -22,6 +22,7 @@ import 'package:childcompass/screeens/parent/parent_settings.dart';
 import 'package:childcompass/screeens/parent/parentsList.dart';
 import 'package:childcompass/screeens/parent/parent_taskscreen.dart';
 import 'package:childcompass/screeens/parent/resetPassword.dart';
+import 'package:childcompass/screeens/parent/speedlimitScreen.dart';
 import 'package:childcompass/services/firebaseMessaging.dart';
 import 'package:childcompass/services/parent/parent_api_service.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -129,6 +130,7 @@ class MyApp extends StatelessWidget  {
         '/ResetPassword':(context)=>ResetPassword(),
         '/ChangePassword':(context)=>ChangePasswordScreen(),
         '/ChangeEmail':(context)=>ChangeEmailScreen(),
+        '/SetSpeedLimit':(context)=>SpeedLimitScreen(),
 
 
 

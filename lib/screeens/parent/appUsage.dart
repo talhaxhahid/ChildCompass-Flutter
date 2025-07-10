@@ -33,6 +33,7 @@ class _AppUsageListState extends ConsumerState<AppUsageList> {
     final Data= await childApiService.getChildUsage(ref.watch(currentChildProvider)!);
     appUsageData=Data!['appUseage'];
     ref.read(batteryProvider.notifier).state=Data!['battery'].toString();
+    ref.read(speedlimitProvider.notifier).state=Data!['speedLimit']?? 10;
 
     setState(() {
       isLoading=false;

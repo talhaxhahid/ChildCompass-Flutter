@@ -115,28 +115,8 @@ class _ChildSettingsScreenState extends ConsumerState<ChildSettingsScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
-              TextField(
-                decoration: InputDecoration(
-                  hintText: 'Name',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
-              SizedBox(height: 5),
-              Text(
-                'This is how your kid will appear in the app and notifications',
-                style: TextStyle(color: Colors.grey[600]),
-              ),
-              SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildGenderOption('boy', Icons.boy, 'A boy'),
-                  _buildGenderOption('girl', Icons.girl, 'A girl'),
-                ],
-              ),
+
+
               SizedBox(height: 60),
               Center(
                 child: SizedBox(

@@ -22,8 +22,8 @@ class _ChangeEmailScreenState extends ConsumerState<ChangeEmailScreen> {
 
   bool _isLoading = false;
   bool _obscurePassword = true;
-  var showVerificationCode = false;
-  bool _emailChangedSuccessfully = false;
+  var showVerificationCode = 0;
+  var emailChangedSuccessfully = 0;
 
   @override
   void dispose() {
@@ -39,7 +39,7 @@ class _ChangeEmailScreenState extends ConsumerState<ChangeEmailScreen> {
   }
 
   Future<void> _submitEmailChange() async {
-    showVerificationCode = true;
+
     setState(() => _isLoading = true);
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.get('authToken');
@@ -55,9 +55,11 @@ class _ChangeEmailScreenState extends ConsumerState<ChangeEmailScreen> {
         );
 
         if (response['success'] == true) {
-          showVerificationCode = true;
+
           setState(() {
+            showVerificationCode = 1;
             _isLoading = false;
+
           });
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(response['message'] ?? 'Verification code sent to new email')),
@@ -88,6 +90,7 @@ class _ChangeEmailScreenState extends ConsumerState<ChangeEmailScreen> {
       return;
     }
 
+    print(verificationCode);
     setState(() => _isLoading = true);
     final parentApiService _apiService = parentApiService();
 
@@ -97,15 +100,19 @@ class _ChangeEmailScreenState extends ConsumerState<ChangeEmailScreen> {
       );
 
       if (response['success'] == true) {
+        emailChangedSuccessfully = 1;
+        print(emailChangedSuccessfully);
         setState(() {
           _isLoading = false;
-          _emailChangedSuccessfully = true;
+          emailChangedSuccessfully = 1;
         });
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Email changed successfully')),
         );
+
         // Update the email in provider if needed
-        // ref.read(parentEmailProvider.notifier).state = _emailController.text;
+        ref.read(parentEmailProvider.notifier).state = _emailController.text;
       } else {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
@@ -149,10 +156,9 @@ class _ChangeEmailScreenState extends ConsumerState<ChangeEmailScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            _emailChangedSuccessfully
+            emailChangedSuccessfully==1
                 ? _buildSuccessScreen()
-                : SizedBox(height: 5,),
-            showVerificationCode
+                : showVerificationCode==1
                 ? _buildVerificationScreen()
                 : _buildEmailForm(),
           ],

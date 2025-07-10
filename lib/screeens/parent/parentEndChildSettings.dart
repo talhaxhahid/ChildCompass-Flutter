@@ -75,7 +75,7 @@ class _ParentEndChildSettingsState extends ConsumerState<ParentEndChildSettings>
           SizedBox(height: 30,),
           ListTile(
             leading: const Icon(Icons.person, color: Color(0xFF373E4E)),
-            title: const Text("Kid’s nickname and avatar"),
+            title: const Text("Add/Change Kid Avatar"),
             subtitle:  Text(ref.read(connectedChildsNameProvider)?[ref.read(currentChildProvider)]),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: (){

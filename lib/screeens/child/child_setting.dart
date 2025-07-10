@@ -4,6 +4,9 @@ import 'package:usage_stats/usage_stats.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+
+import '../../core/api_constants.dart';
 
 class ChildSettingsPermission extends StatefulWidget {
   const ChildSettingsPermission({super.key});
@@ -119,6 +122,12 @@ class _SettingsScreenState extends State<ChildSettingsPermission> {
     );
 
     if (shouldDelete == true) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      final response = await http.get(
+        Uri.parse('${ApiConstants.deleteAccount}/${prefs.get('connectionString')}'),
+      );
+      if(response.statusCode==200){
       try {
         // Stop background service
         final service = FlutterBackgroundService();
@@ -147,6 +156,10 @@ class _SettingsScreenState extends State<ChildSettingsPermission> {
             SnackBar(content: Text('Error deleting account: ${e.toString()}')),
           );
         }
+      }}else{
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Unable to Perform this action Right Now.')),
+        );
       }
     }
   }

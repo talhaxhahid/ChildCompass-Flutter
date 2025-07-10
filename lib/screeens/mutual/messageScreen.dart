@@ -68,6 +68,18 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         setState(() {
           _messages = json.decode(response.body);
           _isLoading = false;
+          if(_messages.isNotEmpty)
+          http.post(
+            Uri.parse('${ApiConstants.messaging}mark-read'),
+              headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+              },
+              body: jsonEncode({
+              'chatId': _messages[0]['chatId'],
+              'userId': widget.currentUserId,
+              })
+          );
         });
         WidgetsBinding.instance?.addPostFrameCallback((_) {
           _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
