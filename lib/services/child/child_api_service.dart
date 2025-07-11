@@ -23,6 +23,7 @@ class childApiService {
       );
 
       if (response.statusCode == 200) {
+        print(response.body);
         return jsonDecode(response.body);
       } else {
         return null; // Handle error cases as needed

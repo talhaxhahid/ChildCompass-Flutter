@@ -27,24 +27,24 @@ class FirebaseMessagingService {
 
   void setupFirebaseMessaging() {
 
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      if (message.data['type'] == 'sos_alert') {
-        print("SOSSS ALERT HIT");
-
-        FlutterRingtonePlayer().play(
-            fromAsset: "assets/audio/sos.mp3",
-          looping: true, // or false depending on your need
-          volume: 1.0,
-          asAlarm: true
-        );
-      }
-    });
-
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      // Handle when the user taps the notification
-      FlutterRingtonePlayer().stop();
-
-    });
+    // FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    //   if (message.data['type'] == 'sos_alert') {
+    //     print("SOSSS ALERT HIT");
+    //
+    //     FlutterRingtonePlayer().play(
+    //         fromAsset: "assets/audio/sos.mp3",
+    //       looping: true, // or false depending on your need
+    //       volume: 1.0,
+    //       asAlarm: true
+    //     );
+    //   }
+    // });
+    //
+    // FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    //   // Handle when the user taps the notification
+    //   FlutterRingtonePlayer().stop();
+    //
+    // });
   }
 
   // Set up notification channels (required for Android 8.0+)

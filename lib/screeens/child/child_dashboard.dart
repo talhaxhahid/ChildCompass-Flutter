@@ -23,7 +23,7 @@ class _childDashboardState extends State<childDashboard> {
   @override
   void initState() {
     super.initState();
-    ChildBackgroundService();
+    //ChildBackgroundService();
     _requestPermissions();
     getChildData();
   }
