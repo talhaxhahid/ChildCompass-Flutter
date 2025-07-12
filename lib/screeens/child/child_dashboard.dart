@@ -1,5 +1,11 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:usage_stats/usage_stats.dart';
+import '../../core/api_constants.dart';
 import '../../core/permissions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/child/child_background_service.dart';
@@ -7,6 +13,8 @@ import '../../services/child/child_location_service.dart';
 import 'package:childcompass/screeens/child/child_taskscreen.dart';
 import '../../services/child/child_api_service.dart';
 import '../../services/parent/parent_api_service.dart';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../mutual/messageScreen.dart';
 
@@ -44,20 +52,37 @@ class _childDashboardState extends State<childDashboard> {
 
       if (!granted) {
         print('Required permissions not granted');
-        return;
-      }
+        Timer.periodic(Duration(seconds: 3), (Timer timer) async {
+          final locationStatus = await Permission.location.status;
+          final locationAlwaysStatus = await Permission.locationAlways.status;
+          final usagePermission = await UsageStats.checkUsagePermission() ?? false;
+          if(locationStatus.isGranted && locationAlwaysStatus.isGranted && usagePermission){
+            final service = FlutterBackgroundService();
+            final isRunning = await service.isRunning();
 
-      // Check service status
-      final service = FlutterBackgroundService();
-      final isRunning = await service.isRunning();
+            if (!isRunning) {
+              print('Starting background service...');
+              ChildBackgroundService();
+              print('Background service started successfully');
+            } else {
+              print('Background service is already running');
+            }
+            timer.cancel();
+          }
+        });
+      }else{
 
-      if (!isRunning) {
-        print('Starting background service...');
-         ChildBackgroundService();
-        print('Background service started successfully');
-      } else {
-        print('Background service is already running');
-      }
+        // Check service status
+        final service = FlutterBackgroundService();
+        final isRunning = await service.isRunning();
+
+        if (!isRunning) {
+          print('Starting background service...');
+          ChildBackgroundService();
+          print('Background service started successfully');
+        } else {
+          print('Background service is already running');
+        }}
     } catch (e) {
       print('Error in _requestPermissions: $e');
       // You might want to show an error message to the user here
@@ -145,6 +170,11 @@ class _childDashboardState extends State<childDashboard> {
                   flex: 7,
                   child: ElevatedButton.icon(
                     onPressed: () {
+                      WebSocketChannel? channel = IOWebSocketChannel.connect(ApiConstants.sosAlertSocket);
+                      channel!.sink.add(jsonEncode({
+                        'type': 'sos',
+                        'childId':childCode
+                      }));
                       childApiService.sosAlert(connectionString: childCode);
                     },
                     style: ElevatedButton.styleFrom(

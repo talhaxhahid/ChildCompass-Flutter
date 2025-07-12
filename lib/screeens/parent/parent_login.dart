@@ -189,6 +189,7 @@ class _ParentLoginState extends ConsumerState<parentLogin> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('user', 'parent');
       await prefs.setString('authToken', token);
+      prefs.setString('parentEmail', response['parent']['email']);
       ref.read(parentEmailProvider.notifier).state = response['parent']['email'];
       if(response['message']=='verifyEmail')
         Navigator.pushReplacementNamed(context, "/emailVerification");

@@ -7,7 +7,9 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:childcompass/provider/parent_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:usage_stats/usage_stats.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import '../../core/api_constants.dart';
@@ -19,7 +21,7 @@ import 'appUsage.dart';
 import 'historyMap.dart';
 import '../../screeens/mutual/placeholder.dart';
 import 'package:screen_state/screen_state.dart';
-import '../../services/parent/parent_background_service.dart';
+
 
 
 class parentDashboard extends ConsumerStatefulWidget {
@@ -69,8 +71,25 @@ class _parentDashboardState extends ConsumerState<parentDashboard> {
 
       if (!granted) {
         print('Required permissions not granted');
-        return;
-      }
+        Timer.periodic(Duration(seconds: 3), (Timer timer) async {
+          final locationStatus = await Permission.location.status;
+          final locationAlwaysStatus = await Permission.locationAlways.status;
+          final usagePermission = await UsageStats.checkUsagePermission() ?? false;
+          if(locationStatus.isGranted && locationAlwaysStatus.isGranted && usagePermission){
+            final service = FlutterBackgroundService();
+            final isRunning = await service.isRunning();
+
+            if (!isRunning) {
+              print('Starting background service...');
+              ChildBackgroundService();
+              print('Background service started successfully');
+            } else {
+              print('Background service is already running');
+            }
+            timer.cancel();
+          }
+        });
+      }else{
 
       // Check service status
       final service = FlutterBackgroundService();
@@ -82,7 +101,7 @@ class _parentDashboardState extends ConsumerState<parentDashboard> {
         print('Background service started successfully');
       } else {
         print('Background service is already running');
-      }
+      }}
     } catch (e) {
       print('Error in _requestPermissions: $e');
       // You might want to show an error message to the user here
@@ -129,6 +148,7 @@ class _parentDashboardState extends ConsumerState<parentDashboard> {
     final response = await parentApiService.parentDetails(token.toString());
     parentName = response['body']['parent']['name'];
     parentEmail = response['body']['parent']['email'];
+    prefs.setString('parentEmail', parentEmail!);
     connectedChilds =
         List<String>.from(response['body']['parent']['childConnectionStrings']);
     ref.read(parentNameProvider.notifier).state = parentName;

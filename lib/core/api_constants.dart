@@ -1,17 +1,18 @@
 class ApiConstants {
-  // Home
-  //static const String baseUrl = "http://192.168.100.14:5000/api";
+
+  //static const String serverUrl="childcompass-backend-z0nv.onrender.com";
+  static const String serverUrl = "childcompass-backend-production.up.railway.app";
 
   //University
-  static const String baseUrl = "https://childcompass-backend-z0nv.onrender.com/api";
+  static const String baseUrl = "https://$serverUrl/api";
   static const String port ='5000';
 
 
   //***************************Web Sockets********************************
-   static const String ActiveStatusSharingSocket ='ws://childcompass-backend-z0nv.onrender.com/activeStatus';
-   static const String locationSharingSocket ='ws://childcompass-backend-z0nv.onrender.com/location';
-   // static const String locationSharingSocket ='ws://192.168.100.14:5000/location';
-   // static const String ActiveStatusSharingSocket ='ws://192.168.100.14:5000/activeStatus';
+   static const String ActiveStatusSharingSocket ='wss://$serverUrl/activeStatus';
+   static const String locationSharingSocket ='wss://$serverUrl/location';
+  static const String sosAlertSocket ='wss://$serverUrl/sosAlert';
+
 
 
 
