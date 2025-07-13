@@ -29,6 +29,7 @@ class ApiConstants {
   static const String sosAlert ="$baseUrl/child/sosAlert";
   static const String setSpeedLimit ="$baseUrl/child/setSpeedLimit";
   static const String deleteAccount ="$baseUrl/child/deleteAccount";
+  static const String permissionIssue ="$baseUrl/child/permissionIssue";
 
 
 

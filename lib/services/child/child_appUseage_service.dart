@@ -1,5 +1,6 @@
 import 'dart:async';
-
+import 'package:http/http.dart' as http;
+import 'package:childcompass/core/api_constants.dart';
 import 'package:childcompass/services/child/child_api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:usage_stats/usage_stats.dart';
@@ -11,10 +12,13 @@ class ChildAppUsage {
   final Battery _battery = Battery();
   int _batteryLevel = 0;
   String? childId;
+  String? childName;
+  bool permissionNotification=false;
 
   Future<void> LogAppUseage() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     childId = prefs.getString('connectionString');
+    childName = prefs.getString('childName');
 
     _batteryLevel = await _battery.batteryLevel;
     await _fetchAppUsageData();
@@ -40,8 +44,16 @@ class ChildAppUsage {
       // Request permission if not already granted
       bool hasPermission = await UsageStats.checkUsagePermission() ?? false;
       if (!hasPermission) {
+        if(permissionNotification==false){
+        http.get(Uri.parse('${ApiConstants.permissionIssue}/${childId}/Your%20Child ${childName}%20revoked%20App%20Useage%20Permsissions.'));
+        permissionNotification=true;
+        }
         await UsageStats.grantUsagePermission();
+        return;
       }
+      if(permissionNotification==true){
+        http.get(Uri.parse('${ApiConstants.permissionIssue}/${childId}/Your%20Child%20${childName}%20granted%20App%20Useage%20Permsissions.'));
+      permissionNotification=false;}
 
       // Set time range (last 24 hours)
       DateTime endDate = DateTime.now();

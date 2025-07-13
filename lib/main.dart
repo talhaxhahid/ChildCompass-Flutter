@@ -130,7 +130,8 @@ class MyApp extends StatelessWidget  {
         '/ResetPassword':(context)=>ResetPassword(),
         '/ChangePassword':(context)=>ChangePasswordScreen(),
         '/ChangeEmail':(context)=>ChangeEmailScreen(),
-        '/SetSpeedLimit':(context)=>SpeedLimitScreen(),
+        '/SetSpeedLimit':(context)=>SpeedLimitScreen()
+
 
 
 

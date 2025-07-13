@@ -60,8 +60,10 @@ class _ParentDashboardButtonState extends ConsumerState<ParentDashboardButton> {
     });
     return Center(
       child: Wrap(
-        spacing: 12,
-        runSpacing: 12,
+         spacing: MediaQuery.of(context).size.width * 0.03,
+         runSpacing: 12,
+
+        alignment: WrapAlignment.spaceBetween,
         children: [
           // Speed Widget
           InkWell(
@@ -69,185 +71,199 @@ class _ParentDashboardButtonState extends ConsumerState<ParentDashboardButton> {
 
               Navigator.pushNamed(context, '/SetSpeedLimit');
             },
-            child: Container(
-              width: 240,
-              height: 60,
-              decoration: BoxDecoration(
-                color: const Color(0xFFF44336),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children:  [
-                      Icon(Icons.speed, color: Colors.white, size: 28),
-                      SizedBox(width: 10),
-                      Text(ref.watch(speedProvider).toString()+" km/hr", style: TextStyle(color: Colors.white, fontSize: 16,fontFamily: "Quantico",)),
-                    ],
-                  ),
-                  Container(width: 1, height: 40, color: Colors.white),
-                  Text("Max\n"+ref.watch(maxSpeedProvider).toString()+" km/hr", style: TextStyle(color: Colors.white, fontSize: 14,fontFamily: "Quantico",)),
-                ],
+            child: FractionallySizedBox(
+              widthFactor: 0.65,
+              child: Container(
+                // width: 240,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF44336),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children:  [
+                        Icon(Icons.speed, color: Colors.white, size: 28),
+                        SizedBox(width: 10),
+                        Text(ref.watch(speedProvider).toString()+" km/hr", style: TextStyle(color: Colors.white, fontSize: 16,fontFamily: "Quantico",)),
+                      ],
+                    ),
+                    Container(width: 1, height: 40, color: Colors.white),
+                    Text("Max\n"+ref.watch(maxSpeedProvider).toString()+" km/hr", style: TextStyle(color: Colors.white, fontSize: 14,fontFamily: "Quantico",)),
+                  ],
+                ),
               ),
             ),
           ),
 
           // Chat Button
-          Stack(
-            children: [
-              GestureDetector(
-                onTap: () {
+          FractionallySizedBox(
+          widthFactor: 0.25,
+            child: Stack(
+              children: [
+                GestureDetector(
+                  onTap: () {
 
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ChatScreen(
-                        currentUserName: ref.read(parentNameProvider)!,
-                        currentUserId: ref.read(parentEmailProvider)!,
-                        otherUserId: ref.read(currentChildProvider)!,
-                        otherUserName: ref.read(connectedChildsNameProvider)![ref.read(currentChildProvider)],
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChatScreen(
+                          currentUserName: ref.read(parentNameProvider)!,
+                          currentUserId: ref.read(parentEmailProvider)!,
+                          otherUserId: ref.read(currentChildProvider)!,
+                          otherUserName: ref.read(connectedChildsNameProvider)![ref.read(currentChildProvider)],
+                        ),
                       ),
-                    ),
-                  );
-                  UnreadCount=0;
-                  setState(() {
+                    );
+                    UnreadCount=0;
+                    setState(() {
 
-                  });
-                },
-                child: Container(
-                  width: 100,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF2D2D2D),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Center(
-                    child: Icon(Icons.chat_bubble_outline, color: Colors.white, size: 28),
+                    });
+                  },
+                  child: Container(
+                    // width: 100,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF2D2D2D),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: const Center(
+                      child: Icon(Icons.chat_bubble_outline, color: Colors.white, size: 28),
+                    ),
                   ),
                 ),
-              ),
-              // Unread count badge
-               UnreadCount>0?Positioned(
-                right: 3,
-                top: 3,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: Colors.red, // Badge color
-                    shape: BoxShape.circle,
-                  ),
-                  constraints: const BoxConstraints(
-                    minWidth: 20,
-                    minHeight: 20,
-                  ),
-                  child: Text(
-                    UnreadCount.toString(), // Replace with your actual unread count
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
+                // Unread count badge
+                 UnreadCount>0?Positioned(
+                  right: 3,
+                  top: 3,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(
+                      color: Colors.red, // Badge color
+                      shape: BoxShape.circle,
                     ),
-                    textAlign: TextAlign.center,
+                    constraints: const BoxConstraints(
+                      minWidth: 20,
+                      minHeight: 20,
+                    ),
+                    child: Text(
+                      UnreadCount.toString(), // Replace with your actual unread count
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                ),
-              ):Container(width: 1,height: 1,),
-            ],
-          ),
-
-          // Battery Button
-          Container(
-            width: 120,
-            height: 60,
-            decoration: BoxDecoration(
-              color: const Color(0xFF2D2D2D),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children:  [
-                _getBatteryIcon(ref.watch(batteryProvider)!),
-                SizedBox(width: 10),
-                Text(ref.watch(batteryProvider).toString()+"%", style: TextStyle(color: Colors.white, fontSize: 16,fontFamily: "Quantico",)),
+                ):Container(width: 1,height: 1,),
               ],
             ),
           ),
 
-          // Geo-fence Button
-          GestureDetector(
-            onTap: (){
-              Navigator.pushNamed(context, '/GeofenceListScreen');
-            },
+          // Battery Button
+          FractionallySizedBox(
+            widthFactor: 0.30,
             child: Container(
-              width: 220,
-              height: 60,
-              decoration: BoxDecoration(
-                color: const Color(0xFF2D6F78),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: const [
-                  Icon(Icons.location_on_outlined, color: Colors.white, size: 28),
-                  SizedBox(width: 12),
-                  Text(
-                    "Geo-fence Locations",
-                    style: TextStyle(color: Colors.white, fontSize: 14,fontFamily: "Quantico",),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // Child Tasks Button
-          GestureDetector(
-            onTap: (){
-              Navigator.pushNamed(context, '/parentTaskScreen');
-            },
-            child: Container(
-
-              width: 240,
-              height: 60,
-              decoration: BoxDecoration(
-                color: const Color(0xFFF44336),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(Icons.checklist_rounded, color: Colors.white, size: 28),
-                      SizedBox(width: 10),
-                      Text("Child Tasks", style: TextStyle(color: Colors.white, fontSize: 15,fontFamily: "Quantico",)),
-                    ],
-                  ),
-                  Container(width: 1, height: 40, color: Colors.white),
-                  const Text("Complete\n3 / 5",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white, fontSize: 12,fontFamily: "Quantico",)),
-                ],
-              ),
-            ),
-          ),
-
-          // Settings Button
-          GestureDetector(
-            onTap: ()=>{Navigator.pushNamed(context, '/parentEndChildSettings')},
-            child: Container(
-              width: 100,
+              // width: 120,
               height: 60,
               decoration: BoxDecoration(
                 color: const Color(0xFF2D2D2D),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Center(
-                child: Icon(Icons.settings_outlined, color: Colors.white, size: 28),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children:  [
+                  _getBatteryIcon(ref.watch(batteryProvider)!),
+                  SizedBox(width: 10),
+                  Text(ref.watch(batteryProvider).toString()+"%", style: TextStyle(color: Colors.white, fontSize: 16,fontFamily: "Quantico",)),
+                ],
+              ),
+            ),
+          ),
+
+          // Geo-fence Button
+          FractionallySizedBox(
+            widthFactor: 0.60,
+            child: GestureDetector(
+              onTap: (){
+                Navigator.pushNamed(context, '/GeofenceListScreen');
+              },
+              child: Container(
+                // width: 220,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF2D6F78),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: const [
+                    Icon(Icons.location_on_outlined, color: Colors.white, size: 28),
+                    SizedBox(width: 12),
+                    Text(
+                      "Geo-fence Locations",
+                      style: TextStyle(color: Colors.white, fontSize: 14,fontFamily: "Quantico",),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // Child Tasks Button
+          FractionallySizedBox(
+            widthFactor: 0.65,
+            child: GestureDetector(
+              onTap: (){
+                Navigator.pushNamed(context, '/parentTaskScreen');
+              },
+              child: Container(
+
+                // width: 240,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF44336),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.checklist_rounded, color: Colors.white, size: 28),
+                        SizedBox(width: 10),
+                        Text("Manage Child Tasks", style: TextStyle(color: Colors.white, fontSize: 15,fontFamily: "Quantico",)),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // Settings Button
+          FractionallySizedBox(
+            widthFactor: 0.25,
+            child: GestureDetector(
+              onTap: ()=>{Navigator.pushNamed(context, '/parentEndChildSettings')},
+              child: Container(
+                // width: 100,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF2D2D2D),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Center(
+                  child: Icon(Icons.settings_outlined, color: Colors.white, size: 28),
+                ),
               ),
             ),
           ),

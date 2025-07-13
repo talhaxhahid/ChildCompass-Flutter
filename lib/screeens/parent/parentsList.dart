@@ -185,7 +185,7 @@ class _ParentCardState extends ConsumerState<ParentCard> {
             ),
           ),
           // Delete icon
-          IconButton(
+          ref.read(parentEmailProvider)==widget.email?Container(width: 1,height: 1,) :IconButton(
             icon: isLoading?CircularProgressIndicator():const Icon(Icons.delete, color: Colors.red),
             onPressed: (
 

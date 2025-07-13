@@ -15,6 +15,7 @@ class ParentTaskScreen extends ConsumerStatefulWidget {
 class _ParentTaskScreenState extends ConsumerState<ParentTaskScreen> {
   final List<Map<String, dynamic>> _tasks = [];
   final _titleController = TextEditingController();
+  var isLoading=false;
   final _priorityController = TextEditingController();
   final _timelineController = TextEditingController();
 
@@ -28,6 +29,7 @@ class _ParentTaskScreenState extends ConsumerState<ParentTaskScreen> {
     fetchCurrentChildTasks().then((loadedTasks) {
       setState(() {
         _tasks.addAll(loadedTasks);
+        isLoading=false;
       });
     });
   }
@@ -91,6 +93,7 @@ class _ParentTaskScreenState extends ConsumerState<ParentTaskScreen> {
   }
 
   Future<List<Map<String, dynamic>>> fetchCurrentChildTasks() async {
+    isLoading=true;
     final String? parentEmail = ref.read(parentEmailProvider);
     final String? connectionString = ref.read(currentChildProvider); // Using connectionString instead of childId
 
@@ -141,107 +144,6 @@ class _ParentTaskScreenState extends ConsumerState<ParentTaskScreen> {
     }
   }
 
-
-  Future<void> fetchIncompleteParentTasks() async {
-    print("🔍 Fetching incomplete parent tasks...");
-    final String? connectionString = ref.read(currentChildProvider);
-
-    if (connectionString == null || connectionString.isEmpty) return;
-
-    try {
-      final url = '${ApiConstants.fetchTask}incomplete-tasks?connectionString=$connectionString';
-      final response = await http.get(Uri.parse(url));
-
-      if (response.statusCode == 200) {
-        final List<dynamic> fetchedTasks = json.decode(response.body);
-
-        setState(() {
-          // Filter only incomplete tasks from parent
-          final incompleteParentTasks = fetchedTasks.where((task) {
-            return task['from'] == 'parent' && task['completed'] == false;
-          }).map((task) {
-            return {
-              '_id': task['_id'],
-              'title': task['title'],
-              'priority': task['priority'],
-              'timeline': Jiffy.parse(task['datetime']).format(pattern: 'do MMM yyyy - h:mm a'),
-              'datetime': DateTime.parse(task['datetime']),
-              'from': 'parent',
-              'completed': false,
-              'connectionString': task['connectionString'] ?? connectionString,
-            };
-          }).toList();
-
-          // Replace only incomplete parent tasks
-          _tasks.removeWhere((task) => task['from'] == 'parent' && task['completed'] == false);
-          _tasks.addAll(incompleteParentTasks);
-        });
-
-        print("✅ Incomplete parent tasks fetched and updated.");
-      } else {
-        throw Exception('Failed to fetch tasks: ${response.statusCode}');
-      }
-    } catch (e) {
-      print("‼️ Exception in fetchIncompleteParentTasks: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error fetching incomplete tasks: ${e.toString().replaceAll('Exception: ', '')}'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
-
-  Future<void> fetchCompletedParentTasks() async {
-    print("🔍 Fetching completed parent tasks...");
-    final String? connectionString = ref.read(currentChildProvider);
-
-    if (connectionString == null || connectionString.isEmpty) return;
-
-    try {
-      final url = '${ApiConstants.fetchTask}completed-tasks?connectionString=$connectionString';
-      final response = await http.get(Uri.parse(url));
-
-      if (response.statusCode == 200) {
-        final List<dynamic> fetchedTasks = json.decode(response.body);
-
-        setState(() {
-          // Filter only completed tasks from parent
-          final completedParentTasks = fetchedTasks.where((task) {
-            return task['from'] == 'parent' && task['completed'] == true;
-          }).map((task) {
-            return {
-              '_id': task['_id'],
-              'title': task['title'],
-              'priority': task['priority'],
-              'timeline': Jiffy.parse(task['datetime']).format(pattern: 'do MMM yyyy - h:mm a'),
-              'datetime': DateTime.parse(task['datetime']),
-              'from': 'parent',
-              'completed': true,
-              'connectionString': task['connectionString'] ?? connectionString,
-            };
-          }).toList();
-
-          // Replace only completed parent tasks
-          _tasks.removeWhere((task) => task['from'] == 'parent' && task['completed'] == true);
-          _tasks.addAll(completedParentTasks);
-
-        });
-
-        print("✅ Completed parent tasks fetched and updated.");
-      } else {
-        throw Exception('Failed to fetch tasks: ${response.statusCode}');
-      }
-    } catch (e) {
-      print("‼️ Exception in fetchCompletedParentTasks: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error fetching completed tasks: ${e.toString().replaceAll('Exception: ', '')}'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
 
 
   void _clearFormFields() {
@@ -435,13 +337,27 @@ class _ParentTaskScreenState extends ConsumerState<ParentTaskScreen> {
           ),
           actions: [
             TextButton(
-              onPressed: () {
+              onPressed: () async {
+                print(_tasks[index]);
+                var response=await http.post(
+                  Uri.parse('${ApiConstants.fetchTaskParent}updateTask'),
+                  headers: {"Content-Type": "application/json"},
+                    body: jsonEncode({
+                      'title': _titleController.text,
+                      'datetime': _selectedDateTime!.dateTime.toUtc().toIso8601String(),
+                      'priority':_priorityController.text,
+                      'taskId':_tasks[index]['_id']
+                    })
+                );
+                print(response.statusCode);
                 setState(() {
                   _tasks[index] = {
                     'title': _titleController.text,
                     'timeline': _selectedDateTime!.format(pattern: 'do MMM yyyy - h:mm a'),
                     'datetime': _selectedDateTime?.dateTime.toIso8601String(),
                     'priority': _priorityController.text,
+                    'completed':false,
+                    '_id':_tasks[index]['_id']
                   };
 
                 });
@@ -456,6 +372,8 @@ class _ParentTaskScreenState extends ConsumerState<ParentTaskScreen> {
   }
 
   void _deleteTask(int index) {
+    http.delete(
+        Uri.parse('${ApiConstants.fetchTaskParent}/${_tasks[index]['_id']}'));
     setState(() {
       _tasks.removeAt(index);
     });
@@ -464,12 +382,10 @@ class _ParentTaskScreenState extends ConsumerState<ParentTaskScreen> {
     if (_selectedTab == 0) return _tasks;
     if (_selectedTab == 1) {
       // Fetch incomplete tasks when the 'Pending Tasks' tab is selected
-      fetchIncompleteParentTasks();
+      //fetchIncompleteParentTasks();
       return _tasks.where((task) => task['completed'] == false).toList();
     }
     if (_selectedTab == 2) {
-      // Fetch completed tasks when the 'Completed Tasks' tab is selected
-      fetchCompletedParentTasks();
       return _tasks.where((task) => task['completed'] == true).toList();
     }
     return _tasks;
@@ -564,7 +480,7 @@ class _ParentTaskScreenState extends ConsumerState<ParentTaskScreen> {
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: _tasks.isEmpty
-                  ? Center(child: Text("No tasks yet. Tap + to add one.", style: TextStyle(color: Color(0xFF718096))))
+                  ? Center(child: isLoading? CircularProgressIndicator():Text("No tasks yet. Tap + to add one.", style: TextStyle(color: Color(0xFF718096))))
                   : ListView.builder(
                 itemCount: _filteredTasks().length,
                 itemBuilder: (context, index) {
@@ -572,7 +488,7 @@ class _ParentTaskScreenState extends ConsumerState<ParentTaskScreen> {
                   return Container(
                     margin: EdgeInsets.only(bottom: 12),
                     decoration: BoxDecoration(
-                      color: Color(0xFFF5F7FA), // White card BG
+                      color: task['completed']?Colors.blueGrey.shade100:Color(0xFFF5F7FA), // White card BG
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
@@ -613,7 +529,7 @@ class _ParentTaskScreenState extends ConsumerState<ParentTaskScreen> {
                           ),
                         ],
                       ),
-                      trailing: Row(
+                      trailing: task['completed']?Container(width: 1 ,height: 1):Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           // Edit Button
@@ -662,39 +578,28 @@ class _ParentTaskScreenState extends ConsumerState<ParentTaskScreen> {
 
 
   Future<void> _selectDateAndTime() async {
-    final DateTime now = DateTime.now();
-    final DateTime initialDate = _selectedDateTime?.dateTime ?? now;
+    final TimeOfDay initialTime = _selectedDateTime != null
+        ? TimeOfDay.fromDateTime(_selectedDateTime!.dateTime)
+        : TimeOfDay.now();
 
-    final DateTime? date = await showDatePicker(
+    final TimeOfDay? time = await showTimePicker(
       context: context,
-      initialDate: initialDate,
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2100),
+      initialTime: initialTime,
     );
 
-    if (date != null) {
-      final TimeOfDay initialTime = _selectedDateTime != null
-          ? TimeOfDay.fromDateTime(_selectedDateTime!.dateTime)
-          : TimeOfDay.now();
-
-      final TimeOfDay? time = await showTimePicker(
-        context: context,
-        initialTime: initialTime,
-      );
-
-      if (time != null) {
-        setState(() {
-          _selectedDateTime = Jiffy.parseFromDateTime(DateTime(
-            date.year,
-            date.month,
-            date.day,
-            time.hour,
-            time.minute,
-          ));
-          _timelineController.text =
-              _selectedDateTime!.format(pattern: 'do MMM yyyy - h:mm a');
-        });
-      }
+    if (time != null) {
+      setState(() {
+        // Create a new DateTime with today's date but the selected time
+        final now = DateTime.now();
+        _selectedDateTime = Jiffy.parseFromDateTime(DateTime(
+          now.year,
+          now.month,
+          now.day,
+          time.hour,
+          time.minute,
+        ));
+        _timelineController.text = _selectedDateTime!.format(pattern: 'h:mm a');
+      });
     }
   }
 

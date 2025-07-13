@@ -14,6 +14,7 @@ class parentLogin extends ConsumerStatefulWidget  {
 class _ParentLoginState extends ConsumerState<parentLogin> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _obscurePassword = true;
 
   @override
   Widget build(BuildContext context) {
@@ -112,19 +113,30 @@ class _ParentLoginState extends ConsumerState<parentLogin> {
                           ),
                         ),
                         SizedBox(height: 10),
-                        TextField(
-                          controller: _passwordController,
-                          keyboardType: TextInputType.visiblePassword,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.white.withOpacity(0.8),
-                            hintText: "Password",
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide.none,
+                      TextField(
+                        controller: _passwordController,
+                        obscureText: _obscurePassword, // This will toggle between hidden and visible
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white.withOpacity(0.8),
+                          hintText: "Password",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide.none,
+                          ),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                              color: Colors.grey,
                             ),
+                            onPressed: () {
+                              setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              });
+                            },
                           ),
                         ),
+                      ),
                         SizedBox(height: 10),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,

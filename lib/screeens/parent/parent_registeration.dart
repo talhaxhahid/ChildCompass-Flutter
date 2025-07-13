@@ -20,6 +20,7 @@ class _parentRegistrationState extends ConsumerState<parentRegistration> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool _obscurePassword = true;
   String? _errorMessage;
 
 
@@ -142,19 +143,30 @@ class _parentRegistrationState extends ConsumerState<parentRegistration> {
                           ),
                         ),
                         SizedBox(height: 10),
-                        TextField(
-                          controller: _passwordController,
-                          obscureText: true,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.white.withOpacity(0.8),
-                            hintText: "Password",
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide.none,
+                      TextField(
+                        controller: _passwordController,
+                        obscureText: _obscurePassword, // This will toggle between hidden and visible
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white.withOpacity(0.8),
+                          hintText: "Password",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide.none,
+                          ),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                              color: Colors.grey,
                             ),
+                            onPressed: () {
+                              setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              });
+                            },
                           ),
                         ),
+                      ),
                         SizedBox(height: 10),
                         if (_errorMessage != null)
                           Text(

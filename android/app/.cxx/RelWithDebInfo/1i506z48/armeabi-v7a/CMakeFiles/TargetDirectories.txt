@@ -1,0 +1,2 @@
+D:/ChildCompass/flutter/android/app/.cxx/RelWithDebInfo/1i506z48/armeabi-v7a/CMakeFiles/edit_cache.dir
+D:/ChildCompass/flutter/android/app/.cxx/RelWithDebInfo/1i506z48/armeabi-v7a/CMakeFiles/rebuild_cache.dir

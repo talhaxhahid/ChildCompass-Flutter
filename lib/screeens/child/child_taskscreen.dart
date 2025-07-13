@@ -17,6 +17,7 @@ class ChildTaskscreen extends StatefulWidget {
 
 class _ChildTaskscreenState extends State<ChildTaskscreen> with TickerProviderStateMixin {
   int selectedTab = 0;
+  var isLoading=false;
   final List<String> tabs = ['My Tasks', 'Parents Task', 'Completed Tasks'];
 
   List<Map<String, dynamic>> myTasks = [];
@@ -39,51 +40,10 @@ class _ChildTaskscreenState extends State<ChildTaskscreen> with TickerProviderSt
     print("Retrieved from Hive: $tasks");
   }
 
-  // Future<void> fetchParentTasks() async {
-  //   print("🔄 Starting to fetch parent tasks...");
-  //   final prefs = await SharedPreferences.getInstance();
-  //   final connectionString = prefs.getString('connectionString');
-  //
-  //   print("connection:$connectionString");
-  //
-  //   if (connectionString == null || connectionString.isEmpty) return;
-  //
-  //   try {
-  //     final url = 'https://childcompass-flutter-backend.onrender.com/api/task/task?connectionString=$connectionString';
-  //     final response = await http.get(Uri.parse(url));
-  //
-  //     if (response.statusCode == 200) {
-  //       final List<dynamic> fetchedTasks = json.decode(response.body);
-  //
-  //       // Clear existing parent tasks more reliably
-  //       setState(() {
-  //         myTasks.removeWhere((task) => task['from'] == 'parent');
-  //       });
-  //
-  //       final newParentTasks = fetchedTasks.map((task) {
-  //         return {
-  //           '_id': task['_id'],
-  //           'title': task['title'],
-  //           'priority': task['priority'],
-  //           'timeline': Jiffy.parse(task['datetime']).format(pattern: 'do MMM yyyy - h:mm a'),
-  //           'datetime': DateTime.parse(task['datetime']),
-  //           'from': 'parent',
-  //           'completed': task['completed'] ?? false,
-  //           'connectionString': task['connectionString'],
-  //         };
-  //       }).toList();
-  //
-  //       setState(() {
-  //         myTasks.addAll(newParentTasks);
-  //         _saveTasksToHive();
-  //       });
-  //     }
-  //   } catch (e) {
-  //     print("‼️ Exception in fetchParentTasks: $e");
-  //   }
-  // }
+
   Future<void> fetchParentTasks() async {
     print("🔄 Starting to fetch parent tasks...");
+    isLoading=true;
     final prefs = await SharedPreferences.getInstance();
     final connectionString = prefs.getString('connectionString');
 
@@ -97,6 +57,7 @@ class _ChildTaskscreenState extends State<ChildTaskscreen> with TickerProviderSt
         final List<dynamic> fetchedTasks = json.decode(response.body);
 
         setState(() {
+          isLoading=false;
           // Create map of existing completed parent tasks
           final completedTasks = {
             for (var task in myTasks.where((t) => t['from'] == 'parent' && t['completed'] == true))
@@ -121,6 +82,7 @@ class _ChildTaskscreenState extends State<ChildTaskscreen> with TickerProviderSt
           myTasks.removeWhere((task) => task['from'] == 'parent');
           myTasks.addAll(newParentTasks);
           _saveTasksToHive();
+
         });
       }
     } catch (e) {
@@ -133,36 +95,6 @@ class _ChildTaskscreenState extends State<ChildTaskscreen> with TickerProviderSt
     _loadTasksFromHive(); // Separate the loading logic
     await fetchParentTasks();
   }
-// Update your _loadTasksFromHive method:
-//   void _loadTasksFromHive() {
-//     final storedData = tasksBox!.get('myTasks', defaultValue: []);
-//
-//     try {
-//       final storedTasks = List<Map<String, dynamic>>.from(
-//           (storedData as List).map((x) {
-//             final task = Map<String, dynamic>.from(x);
-//             // Convert string back to DateTime
-//             if (task['datetime'] is String) {
-//               task['datetime'] = DateTime.parse(task['datetime']);
-//             }
-//             return task;
-//           })
-//       );
-//
-//       setState(() => myTasks = storedTasks);
-//     } catch (e) {
-//       print("⚠️ Error loading tasks from Hive: $e");
-//       setState(() => myTasks = []);
-//     }
-//   }
-//
-//   Future<void> _saveTasksToHive() async {
-//     await tasksBox?.put('myTasks', myTasks.map((task) => {
-//       ...task,
-//       'completed': task['completed'] == true, // Force boolean
-//       'datetime': task['datetime'].toString(), // Serialize DateTime
-//     }).toList());
-//   }
 
   Future<void> _loadTasksFromHive() async {
     try {
@@ -262,7 +194,7 @@ class _ChildTaskscreenState extends State<ChildTaskscreen> with TickerProviderSt
                                   onTap: () async {
                                     print("👉 Tab $index selected");
                                     setState(() => selectedTab = index);
-                                    if (index == 1 && myTasks.where((t) => t['from'] == 'parent').isEmpty) {
+                                    if (index == 1 ) {
                                       await fetchParentTasks();
                                     }
                                   },
@@ -313,7 +245,7 @@ class _ChildTaskscreenState extends State<ChildTaskscreen> with TickerProviderSt
 
                   // Task List
                   Expanded(
-                    child: myTasks.isEmpty
+                    child:(selectedTab == 1 && isLoading)? Center(child: CircularProgressIndicator()):myTasks.isEmpty
                         ? Center(child: Text("No tasks available"))
                         : ListView.builder(
                       itemCount: myTasks.where((task) {
@@ -379,137 +311,178 @@ class _ChildTaskscreenState extends State<ChildTaskscreen> with TickerProviderSt
 
     return Card(
       color: isParentTask ? Colors.grey[200] : Colors.white,
-      margin: EdgeInsets.symmetric(vertical: 8),
+      margin: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 3,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 9.0, vertical: 5.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    // Checkbox for both parent and self tasks
-                    IconButton(
-                      icon: Container(
-                        width: 18,
-                        height: 18,
+      elevation: 2,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () {}, // Optional: Add tap functionality
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Checkbox
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2.0),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(4),
+                      onTap: () async {
+                        final newCompletedState = !(task['completed'] ?? false);
+                        if (isParentTask) {
+                          await _markParentTaskAsCompleted(task, newCompletedState);
+                        } else {
+                          setState(() {
+                            task['completed'] = newCompletedState;
+                            _saveTasksToHive();
+                          });
+                        }
+                      },
+                      child: Container(
+                        width: 22,
+                        height: 22,
                         decoration: BoxDecoration(
                           color: task['completed'] ? Colors.green : Colors.transparent,
-                          border: Border.all(color: Colors.grey),
+                          border: Border.all(
+                            color: task['completed'] ? Colors.green : Colors.grey,
+                            width: 1.5,
+                          ),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: task['completed']
                             ? Icon(Icons.check, size: 16, color: Colors.white)
                             : null,
                       ),
-                        // Update the checkbox onPressed handler:
-                        onPressed: () async {
-                          final newCompletedState = !(task['completed'] ?? false);
-
-                          if (isParentTask) {
-                            await _markParentTaskAsCompleted(task, newCompletedState);
-                          } else {
-                            setState(() {
-                              task['completed'] = newCompletedState;
-                              _saveTasksToHive();
-                            });
-                          }
-                        },
                     ),
-                    Column(
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Title with flexible width
                         Text(
                           task['title'],
                           style: TextStyle(
                             fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             fontFamily: "Quantico",
                             decoration: task['completed']
                                 ? TextDecoration.lineThrough
                                 : TextDecoration.none,
                           ),
+                          maxLines: 5,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        if (isParentTask && task['priority'] != null)
-                          Text(
-                            'Priority: ${task['priority']}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Color(0xFF373E4E),
-                              fontFamily: "Quantico",
+                        SizedBox(height: 4),
+                        // Priority and timeline row
+                        Row(
+                          children: [
+                            if (isParentTask && task['priority'] != null)
+                              Container(
+                                padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: _getPriorityColor(task['priority']),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  task['priority'],
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.white,
+                                    fontFamily: "Quantico",
+                                  ),
+                                ),
+                              ),
+                            if (isParentTask && task['priority'] != null)
+                              SizedBox(width: 8),
+                            Flexible(
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.calendar_today, size: 16, color: Color(0xFF373E4E)),
+                                  SizedBox(width: 4),
+                                  Flexible(
+                                    child: Text(
+                                      timeline,
+                                      style: TextStyle(
+                                          fontSize: 13,
+                                          color: Color(0xFF373E4E),
+                                          fontFamily: "Quantico"
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
+                          ],
+                        ),
                       ],
                     ),
-                  ],
-                ),
-                // Only show edit/delete for self-created tasks that aren't completed
-                if (!isParentTask && !task['completed'])
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        padding: EdgeInsets.zero,
-                        constraints: BoxConstraints(),
-                        icon: Icon(Icons.edit, size: 20),
-                        onPressed: () {
+                  ),
+                  if (!isParentTask && !task['completed'])
+                    PopupMenuButton<String>(
+                      icon: Icon(Icons.more_vert, size: 20),
+                      itemBuilder: (context) => [
+                        PopupMenuItem(
+                          value: 'edit',
+                          child: Row(
+                            children: [
+                              Icon(Icons.edit, size: 18),
+                              SizedBox(width: 8),
+                              Text('Edit'),
+                            ],
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: 'delete',
+                          child: Row(
+                            children: [
+                              Icon(Icons.delete, size: 18, color: Colors.red),
+                              SizedBox(width: 8),
+                              Text('Delete', style: TextStyle(color: Colors.red)),
+                            ],
+                          ),
+                        ),
+                      ],
+                      onSelected: (value) {
+                        if (value == 'edit') {
                           selectedDateTime = task['datetime'];
                           _showTaskForm(isEditing: true, task: task);
-                        },
-                      ),
-                      IconButton(
-                        padding: EdgeInsets.zero,
-                        constraints: BoxConstraints(),
-                        icon: Icon(Icons.delete, size: 20),
-                        onPressed: () {
+                        } else if (value == 'delete') {
                           setState(() {
                             myTasks.remove(task);
                             _saveTasksToHive();
                           });
-                        },
-                      ),
-                    ],
-                  ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 12.0),
-              child: Row(
-                children: [
-                  Icon(Icons.calendar_today, size: 18, color: Color(0xFF373E4E)),
-                  SizedBox(width: 5),
-                  Text(
-                    timeline,
-                    style: TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF373E4E),
-                        fontFamily: "Quantico"
+                        }
+                      },
                     ),
-                  ),
-                  // if (isParentTask) ...[
-                  //   SizedBox(width: 10),
-                  //   Icon(Icons.person, size: 18, color: Color(0xFF373E4E)),
-                  //   SizedBox(width: 5),
-                  //   Text(
-                  //     'From Parent',
-                  //     style: TextStyle(
-                  //         fontSize: 14,
-                  //         color: Color(0xFF373E4E),
-                  //         fontFamily: "Quantico"
-                  //     ),
-                  //   ),
-                  // ],
                 ],
               ),
-            )
-          ],
+            ],
+          ),
         ),
       ),
     );
+  }
+
+// Helper function to get priority color
+  Color _getPriorityColor(String priority) {
+    switch (priority?.toLowerCase()) {
+      case 'high':
+        return Colors.red;
+      case 'medium':
+        return Colors.orange;
+      case 'low':
+        return Colors.green;
+      default:
+        return Colors.grey;
+    }
   }
 
   Future<void> _markParentTaskAsCompleted(Map<String, dynamic> task, bool completed) async {
@@ -679,33 +652,28 @@ class _ChildTaskscreenState extends State<ChildTaskscreen> with TickerProviderSt
 
 
   Future<void> _selectDateAndTime() async {
-    final DateTime? pickedDate = await showDatePicker(
+    final TimeOfDay initialTime = selectedDateTime != null
+        ? TimeOfDay.fromDateTime(selectedDateTime!.dateTime)
+        : TimeOfDay.now();
+
+    final TimeOfDay? time = await showTimePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
+      initialTime: initialTime,
     );
 
-    if (pickedDate != null) {
-      final TimeOfDay? pickedTime = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay.now(),
-      );
-
-      if (pickedTime != null) {
-        final combinedDateTime = DateTime(
-          pickedDate.year,
-          pickedDate.month,
-          pickedDate.day,
-          pickedTime.hour,
-          pickedTime.minute,
-        );
-
-        setState(() {
-          selectedDateTime = Jiffy.parseFromDateTime(combinedDateTime);
-          timelineController.text = selectedDateTime!.format(pattern: 'do MMM yyyy - h:mm a');
-        });
-      }
+    if (time != null) {
+      setState(() {
+        // Create a new DateTime with today's date but the selected time
+        final now = DateTime.now();
+        selectedDateTime = Jiffy.parseFromDateTime(DateTime(
+          now.year,
+          now.month,
+          now.day,
+          time.hour,
+          time.minute,
+        ));
+        timelineController.text = selectedDateTime!.format(pattern: 'h:mm a');
+      });
     }
   }
 }

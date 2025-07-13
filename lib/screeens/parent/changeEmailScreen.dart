@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../provider/parent_provider.dart';
+import '../../services/child/child_background_service.dart';
 import '../../services/parent/parent_api_service.dart';
 
 class ChangeEmailScreen extends ConsumerStatefulWidget {
@@ -113,6 +115,13 @@ class _ChangeEmailScreenState extends ConsumerState<ChangeEmailScreen> {
 
         // Update the email in provider if needed
         ref.read(parentEmailProvider.notifier).state = _emailController.text;
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('parentEmail', _emailController.text);
+        final service = FlutterBackgroundService();
+        if (await service.isRunning()) {
+          service.invoke('stopService');
+        }
+        ChildBackgroundService();
       } else {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(

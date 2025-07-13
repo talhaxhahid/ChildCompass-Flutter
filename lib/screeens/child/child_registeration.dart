@@ -40,20 +40,21 @@ class _ChildRegistrationState extends State<childRegistration> {
           ),
         ),
       ),
-      body: SafeArea(
-        top: false,
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 20),
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage("assets/images/map.jpg"),
-              fit: BoxFit.cover,
-            ),
+      body: Container(
+        height: double.infinity,
+        padding: EdgeInsets.symmetric(horizontal: 20),
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/images/map.jpg"),
+            fit: BoxFit.cover,
           ),
+        ),
+        child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             spacing: 10,
             children: [
+              SizedBox(height: 100,),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -83,93 +84,95 @@ class _ChildRegistrationState extends State<childRegistration> {
                 ],
               ),
               SizedBox(height: 20),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                  child: Container(
-                    width: 320,
-                    padding: EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.white.withOpacity(0.3)),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        TextField(
-                          controller: _nameController,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.white.withOpacity(0.8),
-                            hintText: "Name",
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        TextField(
-                          controller: _ageController,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.white.withOpacity(0.8),
-                            hintText: "Age",
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            ElevatedButton(
-                              onPressed: toggleGender,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: selectedGender == "Boy" ? Colors.black : Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                padding: EdgeInsets.symmetric(horizontal: 30),
+              SingleChildScrollView(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                    child: Container(
+                      width: 320,
+                      padding: EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: Colors.white.withOpacity(0.3)),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextField(
+                            controller: _nameController,
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white.withOpacity(0.8),
+                              hintText: "Name",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide.none,
                               ),
-                              child: Text("Boy", style: TextStyle(color: selectedGender == "Boy" ? Colors.white : Colors.black)),
                             ),
-                            ElevatedButton(
-                              onPressed: toggleGender,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: selectedGender == "Girl" ? Colors.black : Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                padding: EdgeInsets.symmetric(horizontal: 30),
+                          ),
+                          SizedBox(height: 10),
+                          TextField(
+                            controller: _ageController,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white.withOpacity(0.8),
+                              hintText: "Age",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide.none,
                               ),
-                              child: Text("Girl", style: TextStyle(color: selectedGender == "Girl" ? Colors.white : Colors.black)),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10),
-                        ElevatedButton(
-                          onPressed: ()=>{handleRegister(context)},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orange,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            padding: EdgeInsets.symmetric(vertical: 15),
-                          ),
-                          child: Center(
-                            child: Text(
-                              "Continue",
-                              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
                             ),
                           ),
-                        ),
-                      ],
+                          SizedBox(height: 10),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              ElevatedButton(
+                                onPressed: toggleGender,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: selectedGender == "Boy" ? Colors.black : Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  padding: EdgeInsets.symmetric(horizontal: 30),
+                                ),
+                                child: Text("Boy", style: TextStyle(color: selectedGender == "Boy" ? Colors.white : Colors.black)),
+                              ),
+                              ElevatedButton(
+                                onPressed: toggleGender,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: selectedGender == "Girl" ? Colors.black : Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  padding: EdgeInsets.symmetric(horizontal: 30),
+                                ),
+                                child: Text("Girl", style: TextStyle(color: selectedGender == "Girl" ? Colors.white : Colors.black)),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 10),
+                          ElevatedButton(
+                            onPressed: ()=>{handleRegister(context)},
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              padding: EdgeInsets.symmetric(vertical: 15),
+                            ),
+                            child: Center(
+                              child: Text(
+                                "Continue",
+                                style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

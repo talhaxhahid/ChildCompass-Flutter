@@ -1,6 +1,7 @@
 import 'package:childcompass/provider/parent_provider.dart';
 import 'package:childcompass/services/parent/parent_api_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -246,6 +247,10 @@ class _ParentSettingsScreenState extends ConsumerState<ParentSettingsScreen> {
                 // Perform logout logic here
                 final prefs = await SharedPreferences.getInstance();
                 await prefs.clear();
+                final service = FlutterBackgroundService();
+                if (await service.isRunning()) {
+                  service.invoke('stopService');
+                }
                 Navigator.pushNamedAndRemoveUntil(
                     context,
                     '/parentLogin',

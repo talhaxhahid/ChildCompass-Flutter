@@ -151,6 +151,12 @@ class _parentDashboardState extends ConsumerState<parentDashboard> {
     prefs.setString('parentEmail', parentEmail!);
     connectedChilds =
         List<String>.from(response['body']['parent']['childConnectionStrings']);
+    if(connectedChilds?.length==0){
+      Navigator.pushNamed(
+        context,
+        '/childConnection',
+      );
+    }
     ref.read(parentNameProvider.notifier).state = parentName;
     ref.read(parentEmailProvider.notifier).state = parentEmail;
     ref.read(connectedChildsProvider.notifier).state = connectedChilds;

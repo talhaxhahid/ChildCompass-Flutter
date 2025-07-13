@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:childcompass/screeens/child/parent_chat_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -114,9 +115,11 @@ class _childDashboardState extends State<childDashboard> {
               children: [
                 InkWell(
                   onTap: () {
-                    setState(() {
-
-                    });
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      '/childDashboard',
+                          (Route<dynamic> route) => false,
+                    );
                   },
                   child: const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 8.0),
@@ -168,28 +171,7 @@ class _childDashboardState extends State<childDashboard> {
                 // SOS Button - 70%
                 Expanded(
                   flex: 7,
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      WebSocketChannel? channel = IOWebSocketChannel.connect(ApiConstants.sosAlertSocket);
-                      channel!.sink.add(jsonEncode({
-                        'type': 'sos',
-                        'childId':childCode
-                      }));
-                      childApiService.sosAlert(connectionString: childCode);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFF2400), // Scarlet Red
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    icon: const Icon(Icons.error_outline, color: Colors.white),
-                    label: const Text(
-                      "SOS",
-                      style: TextStyle(color: Colors.white,fontFamily: "Quantico"),
-                    ),
-                  ),
+                  child: ColorChangeButtonDemo()
                 ),
                 const SizedBox(width: 10), // spacing between buttons
 
@@ -203,7 +185,7 @@ class _childDashboardState extends State<childDashboard> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text("No Parent Connected...")),
                         );
-                      }else{
+                      }else if(parent.length==1){
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -215,6 +197,20 @@ class _childDashboardState extends State<childDashboard> {
                             ),
                           ),
                         );}
+                      else{
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ParentChatListScreen(
+                              childName: childName,
+                              childId: childCode,
+                              parents: parent,
+
+                            ),
+                          ),
+                        );
+
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
@@ -237,6 +233,115 @@ class _childDashboardState extends State<childDashboard> {
         ],
       ),
 
+    );
+  }
+}
+
+class ColorChangeButtonDemo extends StatefulWidget {
+  @override
+  _ColorChangeButtonDemoState createState() => _ColorChangeButtonDemoState();
+}
+class _ColorChangeButtonDemoState extends State<ColorChangeButtonDemo>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  bool _isHolding = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 2),
+    )..addListener(() {
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return  GestureDetector(
+      onTapDown: (_) {
+        _isHolding = true;
+        _controller.forward(from: 0);
+      },
+      onTapUp: (_) async {
+        _isHolding = false;
+
+        // If you want to trigger an action when held for full 2 seconds:
+        if ((_controller.value * 2)>1.99) {
+          print("SOS ALERT");
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          String childCode = prefs.getString('connectionString')!;
+          WebSocketChannel? channel = IOWebSocketChannel.connect(ApiConstants.sosAlertSocket);
+          channel!.sink.add(jsonEncode({
+            'type': 'sos',
+            'childId':childCode
+          }));
+          childApiService.sosAlert(connectionString: childCode);
+        }
+        _controller.reverse();
+      },
+      onTapCancel: () {
+        _isHolding = false;
+        _controller.reverse();
+      },
+      child: Container(
+
+        height: 50,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: Colors.transparent),
+        ),
+        child: Stack(
+          children: [
+            // Background (red)
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            // Animated foreground (green)
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                widthFactor: _controller.value,
+                child: Container(
+                  color: Colors.orange,
+                  width: double.infinity,
+                  height: double.infinity,
+                ),
+              ),
+            ),
+            // Button text
+            Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                spacing: 5,
+                children: [
+                  const Icon(Icons.error_outline, color: Colors.white),
+                  Text(
+                    _isHolding && _controller.isAnimating
+                        ? 'Sending... ${(_controller.value * 2).toStringAsFixed(1)}s'
+                        : 'SOS',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
