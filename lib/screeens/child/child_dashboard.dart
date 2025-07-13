@@ -329,7 +329,7 @@ class _ColorChangeButtonDemoState extends State<ColorChangeButtonDemo>
                   const Icon(Icons.error_outline, color: Colors.white),
                   Text(
                     _isHolding && _controller.isAnimating
-                        ? 'Sending... ${(_controller.value * 2).toStringAsFixed(1)}s'
+                        ? 'Hold it... ${(_controller.value * 2).toStringAsFixed(1)}s'
                         : 'SOS',
                     style: TextStyle(
                       color: Colors.white,

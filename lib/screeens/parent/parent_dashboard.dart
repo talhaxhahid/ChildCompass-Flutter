@@ -75,7 +75,9 @@ class _parentDashboardState extends ConsumerState<parentDashboard> {
           final locationStatus = await Permission.location.status;
           final locationAlwaysStatus = await Permission.locationAlways.status;
           final usagePermission = await UsageStats.checkUsagePermission() ?? false;
+          print('checked for permission after 3 sec to start sos service');
           if(locationStatus.isGranted && locationAlwaysStatus.isGranted && usagePermission){
+            print('checked for permission after 2 sec to start sos service');
             final service = FlutterBackgroundService();
             final isRunning = await service.isRunning();
 

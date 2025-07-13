@@ -1,4 +1,5 @@
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:usage_stats/usage_stats.dart';
 
 class permissions {
@@ -30,6 +31,11 @@ class permissions {
   }
 
   static Future<bool> requestUseagePermissions() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var user = prefs.get('user');
+    if(user=='parent'){
+      return true;
+    }
     bool hasPermission = await UsageStats.checkUsagePermission() ?? false;
     if (!hasPermission) {
       await UsageStats.grantUsagePermission();
